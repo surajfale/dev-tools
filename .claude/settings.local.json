@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(corepack enable)",
+      "Bash(corepack prepare:*)",
+      "Bash(pnpm add:*)",
+      "Bash(rimraf:*)"
+    ],
+    "deny": []
+  }
+}

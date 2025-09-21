@@ -23,7 +23,16 @@ pnpm preview
 
 # Lint code (ESLint with React-specific rules)
 pnpm lint
+
+# Deploy to Netlify (build + deploy)
+pnpm deploy:netlify
 ```
+
+## Package Manager Configuration
+
+- **Required**: pnpm (configured in `packageManager` field)
+- **Node Version**: 18.18.0 (specified in `.nvmrc`)
+- **pnpm Config**: Auto-install peers enabled, shameful hoisting for compatibility
 
 ## Architecture Overview
 
@@ -110,3 +119,31 @@ Each tool follows this pattern:
 - Large text processing is handled synchronously (consider workers for huge files)
 - State updates are batched to prevent excessive re-renders
 - Material UI components are tree-shaken automatically by Vite
+
+## Development Environment
+
+### Vite Configuration
+- Development server configured on port 3000 with auto-open browser
+- React plugin with fast refresh enabled
+- ESM modules with React 18 support
+
+### Theme System
+- Dual theme support (light/dark) with system preference detection
+- Theme state persisted in localStorage
+- Material UI theming with custom component defaults
+- Responsive design breakpoints for mobile/desktop
+
+### Key Development Patterns
+
+#### Adding New Tools
+1. Create utility function in `src/lib/` following existing patterns
+2. Create route component in `src/routes/` with consistent UI structure
+3. Add route to `src/App.jsx` router configuration
+4. Update sidebar navigation in `src/components/Layout/Sidebar.jsx`
+5. Follow existing patterns for options, error handling, and actions
+
+#### Common Component Props
+- All tools accept `input` and options via controlled components
+- Use `ErrorAlert` for consistent error messaging
+- Include `CopyButton`, `DownloadButton`, and `SampleInputButton` actions
+- Maintain keyboard shortcut support (Ctrl/Cmd+Enter)
