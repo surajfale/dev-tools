@@ -180,10 +180,6 @@ src/
 - Some advanced YAML features (anchors, custom tags) may not convert perfectly
 - File downloads use browser's default download location
 
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
-
 ---
 
 Built with ❤️ using React, Vite, and Material UI
