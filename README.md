@@ -51,24 +51,25 @@ A comprehensive collection of essential developer utilities built with React, Vi
 
 ## Tech Stack
 
-- **Frontend**: React 18 with JSX
-- **Build Tool**: Vite for fast development and optimized builds
-- **UI Framework**: Material UI (MUI) v5 for consistent design
+- **Frontend**: React 18 with functional components and hooks
+- **Build Tool**: Vite with React plugin and fast refresh
+- **UI Framework**: Material UI (MUI) v5 with custom theming
 - **Routing**: React Router DOM for client-side navigation
-- **Package Manager**: pnpm for efficient dependency management
-- **Parsing Libraries**:
-  - `sql-formatter` for SQL formatting
-  - `marked` for Markdown parsing
-  - `js-yaml` for YAML processing
-  - `dayjs` for date/time manipulation
-  - `dompurify` for HTML sanitization
+- **Package Manager**: pnpm (required, configured in packageManager field)
+- **Linting**: ESLint with React, hooks, and refresh plugins
+- **Key Libraries**:
+  - `sql-formatter` - Multi-dialect SQL formatting
+  - `marked` - Markdown to HTML parsing
+  - `js-yaml` - YAML parsing and stringification
+  - `dayjs` - Lightweight date manipulation
+  - `dompurify` - HTML sanitization for security
 
 ## Setup and Installation
 
 ### Prerequisites
 
-- Node.js 16+ 
-- pnpm (recommended) or npm
+- Node.js 18.18.0+ (see `.nvmrc`)
+- pnpm (required - configured as package manager)
 
 ### Installation
 
@@ -77,17 +78,14 @@ A comprehensive collection of essential developer utilities built with React, Vi
 git clone <repository-url>
 cd dev-tools
 
-# Install dependencies with pnpm
+# Install dependencies with pnpm (required)
 pnpm install
-
-# Or with npm
-npm install
 ```
 
 ### Development
 
 ```bash
-# Start development server (runs on http://localhost:3000)
+# Start development server (runs on http://localhost:3000, auto-opens browser)
 pnpm dev
 
 # Build for production
@@ -96,8 +94,11 @@ pnpm build
 # Preview production build
 pnpm preview
 
-# Lint code (if configured)
+# Lint code (ESLint with React-specific rules)
 pnpm lint
+
+# Deploy to Netlify (build + deploy)
+pnpm deploy:netlify
 ```
 
 ## Project Structure
@@ -165,13 +166,23 @@ src/
 - Optimized Material UI theme configuration
 - Lazy loading of heavy parsing libraries where possible
 
+## Development Notes
+
+- **Theme System**: Dual theme support (light/dark) with system preference detection and localStorage persistence
+- **Component Architecture**: Business logic separated in `src/lib/` modules, UI components follow consistent patterns
+- **Error Handling**: Uses `ErrorAlert` component for user-friendly error display with library-specific error parsing
+- **Responsive Design**: Mobile-first approach with Material UI breakpoints
+- **Accessibility**: Full ARIA support, keyboard navigation, and screen reader compatibility
+
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Make your changes following existing patterns
+4. Run `pnpm lint` to check code quality
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
 ## Known Limitations
 
@@ -179,6 +190,10 @@ src/
 - HTML to Markdown conversion uses basic regex patterns (not AST-based)
 - Some advanced YAML features (anchors, custom tags) may not convert perfectly
 - File downloads use browser's default download location
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
