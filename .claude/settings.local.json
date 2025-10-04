@@ -7,7 +7,10 @@
       "Bash(corepack enable)",
       "Bash(corepack prepare:*)",
       "Bash(pnpm add:*)",
-      "Bash(rimraf:*)"
+      "Bash(rimraf:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

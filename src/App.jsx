@@ -9,6 +9,9 @@ import SqlFormatter from './routes/SqlFormatter';
 import TimestampConverter from './routes/TimestampConverter';
 import MarkdownHtml from './routes/MarkdownHtml';
 import JsonYaml from './routes/JsonYaml';
+import HtmlPreview from './routes/HtmlPreview';
+import MathCalculator from './routes/MathCalculator';
+import SharedPreview from './routes/SharedPreview';
 
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -30,17 +33,24 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Layout isDarkMode={isDarkMode} onThemeToggle={handleThemeToggle}>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/json-formatter" element={<JsonFormatter />} />
-            <Route path="/sql-formatter" element={<SqlFormatter />} />
-            <Route path="/timestamp-converter" element={<TimestampConverter />} />
-            <Route path="/markdown-html" element={<MarkdownHtml />} />
-            <Route path="/json-yaml" element={<JsonYaml />} />
-          </Routes>
-        </Layout>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Routes>
+          <Route path="/preview" element={<SharedPreview />} />
+          <Route path="*" element={
+            <Layout isDarkMode={isDarkMode} onThemeToggle={handleThemeToggle}>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/json-formatter" element={<JsonFormatter />} />
+                <Route path="/sql-formatter" element={<SqlFormatter />} />
+                <Route path="/timestamp-converter" element={<TimestampConverter />} />
+                <Route path="/markdown-html" element={<MarkdownHtml />} />
+                <Route path="/json-yaml" element={<JsonYaml />} />
+                <Route path="/html-preview" element={<HtmlPreview />} />
+                <Route path="/math-calculator" element={<MathCalculator />} />
+              </Routes>
+            </Layout>
+          } />
+        </Routes>
       </Router>
     </ThemeProvider>
   );

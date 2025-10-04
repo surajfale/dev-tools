@@ -8,13 +8,15 @@ import {
   Toolbar,
   Box
 } from '@mui/material';
-import { 
+import {
   Dashboard,
   Code,
   Storage,
   Schedule,
   Article,
-  SwapHoriz
+  SwapHoriz,
+  Visibility,
+  Calculate
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -27,6 +29,8 @@ const menuItems = [
   { text: 'Timestamp Converter', path: '/timestamp-converter', icon: <Schedule /> },
   { text: 'Markdown ↔ HTML', path: '/markdown-html', icon: <Article /> },
   { text: 'JSON ↔ YAML', path: '/json-yaml', icon: <SwapHoriz /> },
+  { text: 'HTML Preview', path: '/html-preview', icon: <Visibility /> },
+  { text: 'Math Calculator', path: '/math-calculator', icon: <Calculate /> },
 ];
 
 export default function Sidebar({ 

@@ -1,18 +1,18 @@
-import { 
-  Typography, 
-  Grid, 
-  Card, 
-  CardContent, 
-  CardActions, 
-  Button,
+import {
+  Typography,
+  Grid,
+  Card,
+  CardContent,
   Box
 } from '@mui/material';
-import { 
+import {
   Code,
   Storage,
   Schedule,
   Article,
-  SwapHoriz
+  SwapHoriz,
+  Visibility,
+  Calculate
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -51,6 +51,20 @@ const tools = [
     icon: <SwapHoriz />,
     path: '/json-yaml',
     color: 'warning'
+  },
+  {
+    title: 'HTML Preview',
+    description: 'Preview HTML with live rendering. Upload to cloud for permanent shareable links (any file size).',
+    icon: <Visibility />,
+    path: '/html-preview',
+    color: 'error'
+  },
+  {
+    title: 'Math Calculator',
+    description: 'Sum numbers separated by commas, spaces, or new lines. Shows sum, average, min, max, and count.',
+    icon: <Calculate />,
+    path: '/math-calculator',
+    color: 'success'
   }
 ];
 
@@ -70,11 +84,12 @@ export default function Dashboard() {
       <Grid container spacing={3} sx={{ mt: 2 }}>
         {tools.map((tool) => (
           <Grid item xs={12} sm={6} md={4} key={tool.path}>
-            <Card 
-              sx={{ 
-                height: '100%', 
-                display: 'flex', 
+            <Card
+              sx={{
+                height: '100%',
+                display: 'flex',
                 flexDirection: 'column',
+                cursor: 'pointer',
                 transition: 'transform 0.2s ease-in-out',
                 '&:hover': {
                   transform: 'translateY(-4px)',
@@ -82,6 +97,8 @@ export default function Dashboard() {
                 }
               }}
               elevation={2}
+              onClick={() => navigate(tool.path)}
+              aria-label={`Open ${tool.title}`}
             >
               <CardContent sx={{ flexGrow: 1 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -96,16 +113,6 @@ export default function Dashboard() {
                   {tool.description}
                 </Typography>
               </CardContent>
-              <CardActions>
-                <Button 
-                  size="small" 
-                  color={tool.color}
-                  onClick={() => navigate(tool.path)}
-                  aria-label={`Open ${tool.title}`}
-                >
-                  Open Tool
-                </Button>
-              </CardActions>
             </Card>
           </Grid>
         ))}

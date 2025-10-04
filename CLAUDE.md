@@ -32,7 +32,6 @@ pnpm deploy:netlify
 
 - **Required**: pnpm (configured in `packageManager` field)
 - **Node Version**: 18.18.0 (specified in `.nvmrc`)
-- **pnpm Config**: Auto-install peers enabled, shameful hoisting for compatibility
 
 ## Architecture Overview
 
@@ -142,8 +141,42 @@ Each tool follows this pattern:
 4. Update sidebar navigation in `src/components/Layout/Sidebar.jsx`
 5. Follow existing patterns for options, error handling, and actions
 
+#### Utility Function Pattern (src/lib/)
+All utility functions follow a consistent return pattern:
+```javascript
+// Success case
+{ success: true, result: "formatted output" }
+
+// Error case
+{ success: false, error: "Error message", line: "optional position info" }
+```
+
 #### Common Component Props
 - All tools accept `input` and options via controlled components
+- Use Material UI `TextField` with `minRows={12}` for multiline text areas (Material UI automatically enables multiline mode when minRows/maxRows is set)
 - Use `ErrorAlert` for consistent error messaging
 - Include `CopyButton`, `DownloadButton`, and `SampleInputButton` actions
-- Maintain keyboard shortcut support (Ctrl/Cmd+Enter)
+- Maintain keyboard shortcut support (Ctrl/Cmd+Enter) using `useEffect` with keydown event listener
+
+## Commit Message Guidelines
+
+When making changes to this codebase, always generate conventional commit messages that:
+
+1. **Follow conventional commit format**: `type(scope): description`
+2. **Keep messages concise**: Maximum 2 lines, short and to the point
+3. **Understand project context**: This is a React + Material-UI developer tools collection with JSON, SQL, timestamp, Markdown/HTML, and JSON/YAML converters
+4. **Use appropriate types**:
+   - `feat`: New features (components, tools, UI enhancements)
+   - `fix`: Bug fixes (UI issues, formatting errors, conversion problems)
+   - `style`: UI/styling changes (Material-UI components, responsive design)
+   - `refactor`: Code restructuring without functionality changes
+   - `docs`: Documentation updates (README, CLAUDE.md, comments)
+   - `chore`: Build tools, dependencies, configuration changes
+
+**Examples**:
+- `feat(ui): add footer with copyright and GitHub link`
+- `fix(layout): improve responsive design for mobile devices`
+- `style(footer): position footer at bottom of screen`
+- `refactor(components): extract Footer component from App.jsx`
+
+Always consider the app's core features (JSON/SQL formatting, timestamp conversion, Markdown/HTML conversion, JSON/YAML conversion, theme customization) when crafting commit messages.
