@@ -1,6 +1,6 @@
 # Developer Tools
 
-A comprehensive collection of essential developer utilities built with React, Vite, and Material UI. This application provides a clean, responsive interface for common development tasks including JSON formatting, SQL formatting, timestamp conversion, and format conversions.
+A comprehensive collection of essential developer utilities built with React, Vite, and Material UI. This application provides a clean, responsive interface for common development tasks including JSON formatting, SQL formatting, timestamp conversion, format conversions, HTML preview, and math calculations.
 
 ## Features
 
@@ -37,6 +37,22 @@ A comprehensive collection of essential developer utilities built with React, Vi
    - Configurable JSON formatting options
    - Validation and error reporting for both formats
    - Preserves data types and structure
+
+6. **HTML Preview**
+   - Live HTML rendering with iframe isolation and script support
+   - Automatic HTML minification and compression (30-60% size reduction)
+   - Cloud upload to dpaste.com with 7-day auto-deletion
+   - Shareable links with CORS proxy fallback for any file size
+   - URL-based sharing for small files (<8KB)
+   - Privacy warning for user safety
+   - Support for full HTML documents with styles and JavaScript
+
+7. **Math Calculator**
+   - Sum numbers from comma, space, or newline separated input
+   - Support for decimals and mixed separators
+   - Display sum, count, average, minimum, and maximum
+   - Beautiful card-based results UI
+   - Copy sum to clipboard for quick use
 
 ### ✨ User Experience Features
 
@@ -114,7 +130,10 @@ src/
 │   ├── SqlFormatter.jsx     # SQL formatting tool
 │   ├── TimestampConverter.jsx # Timestamp conversion tool
 │   ├── MarkdownHtml.jsx     # Markdown/HTML converter
-│   └── JsonYaml.jsx         # JSON/YAML converter
+│   ├── JsonYaml.jsx         # JSON/YAML converter
+│   ├── HtmlPreview.jsx      # HTML preview with cloud upload
+│   ├── MathCalculator.jsx   # Math calculator tool
+│   └── SharedPreview.jsx    # Shareable HTML preview page
 ├── components/
 │   ├── Layout/              # Layout components
 │   │   ├── Header.jsx       # Top navigation bar
@@ -131,7 +150,11 @@ src/
     ├── formatSql.js         # SQL formatting logic
     ├── convertTime.js       # Timestamp conversion logic
     ├── convertMarkdownHtml.js # Markdown/HTML conversion
-    └── convertJsonYaml.js   # JSON/YAML conversion
+    ├── convertJsonYaml.js   # JSON/YAML conversion
+    ├── previewHtml.js       # HTML sanitization for preview
+    ├── minifyHtml.js        # HTML minification and compression
+    ├── uploadHtml.js        # Cloud upload to pastebin services
+    └── calculateSum.js      # Math calculation utilities
 ```
 
 ## Usage Instructions

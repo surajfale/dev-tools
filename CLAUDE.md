@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A React-based collection of developer utilities including JSON formatter, SQL formatter, timestamp converter, Markdown/HTML converter, and JSON/YAML converter. Built with Vite, Material UI, and modern React patterns.
+A React-based collection of developer utilities including JSON formatter, SQL formatter, timestamp converter, Markdown/HTML converter, JSON/YAML converter, HTML preview with cloud sharing, and math calculator. Built with Vite, Material UI, and modern React patterns.
 
 ## Development Commands
 
@@ -62,7 +62,10 @@ src/
 │   ├── SqlFormatter.jsx        # Multi-dialect SQL formatting
 │   ├── TimestampConverter.jsx  # Unix/ISO timestamp conversion
 │   ├── MarkdownHtml.jsx        # Bidirectional Markdown ↔ HTML
-│   └── JsonYaml.jsx            # Bidirectional JSON ↔ YAML
+│   ├── JsonYaml.jsx            # Bidirectional JSON ↔ YAML
+│   ├── HtmlPreview.jsx         # HTML preview with cloud upload
+│   ├── MathCalculator.jsx      # Math calculator for summing numbers
+│   └── SharedPreview.jsx       # Shareable HTML preview page
 ├── components/
 │   ├── Layout/                 # App structure components
 │   │   ├── Header.jsx          # Top nav with theme toggle
@@ -79,7 +82,11 @@ src/
     ├── formatSql.js            # SQL dialect formatting
     ├── convertTime.js          # Timestamp conversions
     ├── convertMarkdownHtml.js  # Markdown/HTML bidirectional
-    └── convertJsonYaml.js      # JSON/YAML bidirectional
+    ├── convertJsonYaml.js      # JSON/YAML bidirectional
+    ├── previewHtml.js          # HTML sanitization for preview
+    ├── minifyHtml.js           # HTML minification (30-60% reduction)
+    ├── uploadHtml.js           # Cloud upload to pastebin services
+    └── calculateSum.js         # Math calculation utilities
 ```
 
 ### State Management Patterns
@@ -164,7 +171,7 @@ When making changes to this codebase, always generate conventional commit messag
 
 1. **Follow conventional commit format**: `type(scope): description`
 2. **Keep messages concise**: Maximum 2 lines, short and to the point
-3. **Understand project context**: This is a React + Material-UI developer tools collection with JSON, SQL, timestamp, Markdown/HTML, and JSON/YAML converters
+3. **Understand project context**: This is a React + Material-UI developer tools collection with JSON, SQL, timestamp, Markdown/HTML, JSON/YAML converters, HTML preview with cloud sharing, and math calculator
 4. **Use appropriate types**:
    - `feat`: New features (components, tools, UI enhancements)
    - `fix`: Bug fixes (UI issues, formatting errors, conversion problems)
@@ -179,4 +186,19 @@ When making changes to this codebase, always generate conventional commit messag
 - `style(footer): position footer at bottom of screen`
 - `refactor(components): extract Footer component from App.jsx`
 
-Always consider the app's core features (JSON/SQL formatting, timestamp conversion, Markdown/HTML conversion, JSON/YAML conversion, theme customization) when crafting commit messages.
+Always consider the app's core features (JSON/SQL formatting, timestamp conversion, Markdown/HTML conversion, JSON/YAML conversion, HTML preview with cloud sharing, math calculator, theme customization) when crafting commit messages.
+
+## Additional Tool-Specific Patterns
+
+### HTML Preview Tool
+- Uses iframe with `sandbox="allow-same-origin allow-scripts"` for isolated rendering
+- Cloud upload to dpaste.com (7-day expiration) with fallback to paste.ee/rentry
+- CORS proxy fallback for fetching shared content
+- HTML minification reduces size by 30-60% for shareable links
+- Privacy warning displayed to users about not uploading sensitive data
+
+### Math Calculator
+- Parses numbers separated by comma, space, or newline
+- Returns object with sum, count, average, min, max, and numbers array
+- All calculations handled in `src/lib/calculateSum.js`
+- Results displayed in card-based UI with copy functionality
