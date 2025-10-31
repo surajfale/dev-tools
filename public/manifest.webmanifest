@@ -1,0 +1,30 @@
+{
+  "name": "Developer Tools",
+  "short_name": "DevTools",
+  "description": "Essential developer utilities: JSON/SQL formatter, timestamp converter, and more.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1976d2",
+  "icons": [
+    { "src": "/icons/icon-192.svg", "sizes": "192x192", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/icon-512.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-monochrome.svg", "sizes": "512x512", "type": "image/svg+xml", "purpose": "monochrome" },
+    { "src": "/icons/icon-monochrome.png", "sizes": "512x512", "type": "image/png", "purpose": "monochrome" }
+  ],
+  "shortcuts": [
+    { "name": "JSON Formatter", "short_name": "JSON", "url": "/json-formatter" },
+    { "name": "SQL Formatter", "short_name": "SQL", "url": "/sql-formatter" },
+    { "name": "Timestamp Converter", "short_name": "Time", "url": "/timestamp-converter" },
+    { "name": "Markdown ↔ HTML", "short_name": "MD↔HTML", "url": "/markdown-html" },
+    { "name": "JSON ↔ YAML", "short_name": "JSON↔YAML", "url": "/json-yaml" },
+    { "name": "HTML Preview", "short_name": "Preview", "url": "/html-preview" },
+    { "name": "Math Calculator", "short_name": "Math", "url": "/math-calculator" }
+  ]
+}
+
+
