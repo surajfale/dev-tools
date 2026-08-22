@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -32,9 +32,9 @@ export default function TimestampConverter() {
   const [error, setError] = useState('');
   const [currentTime, setCurrentTime] = useState(getCurrentTimestamp());
 
-  const handleConvert = () => {
+  const handleConvert = useCallback(() => {
     const conversionResult = convertTimestamp(input);
-    
+
     if (conversionResult.success) {
       setResult(conversionResult.result);
       setError('');
@@ -42,7 +42,7 @@ export default function TimestampConverter() {
       setError(conversionResult.error);
       setResult(null);
     }
-  };
+  }, [input]);
 
   const handleClear = () => {
     setInput('');
@@ -73,7 +73,7 @@ export default function TimestampConverter() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input]);
+  }, [handleConvert]);
 
   useEffect(() => {
     const interval = setInterval(() => {

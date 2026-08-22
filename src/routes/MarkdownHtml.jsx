@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -82,19 +82,19 @@ export default function MarkdownHtml() {
   const [error, setError] = useState('');
   const [direction, setDirection] = useState('md-to-html');
 
-  const handleConvert = () => {
+  const handleConvert = useCallback(() => {
     let result;
-    
+
     if (direction === 'md-to-html') {
       result = convertMarkdownToHtml(input);
     } else {
       result = convertHtmlToMarkdown(input);
     }
-    
+
     if (result.success) {
       setOutput(result.result);
       setError('');
-      
+
       // Set preview for markdown to HTML conversion
       if (direction === 'md-to-html') {
         setPreview(result.result);
@@ -106,7 +106,7 @@ export default function MarkdownHtml() {
       setOutput('');
       setPreview('');
     }
-  };
+  }, [input, direction]);
 
   const handleClear = () => {
     setInput('');
@@ -142,7 +142,7 @@ export default function MarkdownHtml() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input, direction]);
+  }, [handleConvert]);
 
   const isMarkdownToHtml = direction === 'md-to-html';
   const inputLabel = isMarkdownToHtml ? 'Markdown Input' : 'HTML Input';

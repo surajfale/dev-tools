@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -74,15 +74,15 @@ export default function JsonYaml() {
   const [indent, setIndent] = useState(2);
   const [minify, setMinify] = useState(false);
 
-  const handleConvert = () => {
+  const handleConvert = useCallback(() => {
     let result;
-    
+
     if (direction === 'json-to-yaml') {
       result = convertJsonToYaml(input);
     } else {
       result = convertYamlToJson(input, { indent, minify });
     }
-    
+
     if (result.success) {
       setOutput(result.result);
       setError('');
@@ -90,7 +90,7 @@ export default function JsonYaml() {
       setError(result.error);
       setOutput('');
     }
-  };
+  }, [input, direction, indent, minify]);
 
   const handleClear = () => {
     setInput('');
@@ -124,7 +124,7 @@ export default function JsonYaml() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input, direction, indent, minify]);
+  }, [handleConvert]);
 
   const isJsonToYaml = direction === 'json-to-yaml';
   const inputLabel = isJsonToYaml ? 'JSON Input' : 'YAML Input';

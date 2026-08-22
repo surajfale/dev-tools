@@ -2,11 +2,12 @@ import js from '@eslint/js'
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import globals from 'globals'
 
 export default [
   js.configs.recommended,
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['src/**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: 'module',
@@ -15,18 +16,7 @@ export default [
           jsx: true,
         },
       },
-      globals: {
-        window: 'readonly',
-        document: 'readonly',
-        console: 'readonly',
-        process: 'readonly',
-        localStorage: 'readonly',
-        navigator: 'readonly',
-        Blob: 'readonly',
-        URL: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-      },
+      globals: globals.browser,
     },
     plugins: {
       react,
@@ -50,6 +40,22 @@ export default [
     },
   },
   {
-    ignores: ['dist', 'node_modules'],
+    files: ['public/sw.js'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      sourceType: 'script',
+      globals: globals.serviceworker,
+    },
+  },
+  {
+    files: ['*.config.js', 'scripts/**/*.{js,mjs}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      sourceType: 'module',
+      globals: globals.node,
+    },
+  },
+  {
+    ignores: ['dist', 'node_modules', '.claude'],
   },
 ]

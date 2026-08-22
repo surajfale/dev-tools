@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -79,7 +79,7 @@ export default function HtmlPreview() {
   const [cloudExpiration, setCloudExpiration] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
-  const handlePreview = () => {
+  const handlePreview = useCallback(() => {
     const result = sanitizeHtml(input);
 
     if (result.success) {
@@ -101,7 +101,7 @@ export default function HtmlPreview() {
       setCloudService('');
       setCloudExpiration('');
     }
-  };
+  }, [input]);
 
   const handleClear = () => {
     setInput('');
@@ -234,7 +234,7 @@ export default function HtmlPreview() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input]);
+  }, [handlePreview]);
 
   return (
     <Box>
@@ -242,7 +242,7 @@ export default function HtmlPreview() {
         HTML Preview
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Paste HTML code and see it rendered live. For small files, shareable links are automatically minified. For large files, use "Upload & Share" to get a shareable link. Use Ctrl/Cmd+Enter to preview quickly.
+        Paste HTML code and see it rendered live. For small files, shareable links are automatically minified. For large files, use &quot;Upload &amp; Share&quot; to get a shareable link. Use Ctrl/Cmd+Enter to preview quickly.
       </Typography>
 
       <Alert severity="warning" sx={{ mb: 3 }}>

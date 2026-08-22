@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -31,9 +31,9 @@ export default function SqlFormatter() {
   const [uppercase, setUppercase] = useState(true);
   const [indentSize, setIndentSize] = useState(2);
 
-  const handleFormat = () => {
+  const handleFormat = useCallback(() => {
     const result = formatSql(input, { dialect, uppercase, indentSize });
-    
+
     if (result.success) {
       setOutput(result.result);
       setError('');
@@ -41,7 +41,7 @@ export default function SqlFormatter() {
       setError(result.error);
       setOutput('');
     }
-  };
+  }, [input, dialect, uppercase, indentSize]);
 
   const handleClear = () => {
     setInput('');
@@ -64,7 +64,7 @@ export default function SqlFormatter() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input, dialect, uppercase, indentSize]);
+  }, [handleFormat]);
 
   return (
     <Box>

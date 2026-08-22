@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -47,9 +47,9 @@ export default function JsonFormatter() {
   const [minify, setMinify] = useState(false);
   const [sortKeys, setSortKeys] = useState(false);
 
-  const handleFormat = () => {
+  const handleFormat = useCallback(() => {
     const result = formatJson(input, { indent, minify, sortKeys });
-    
+
     if (result.success) {
       setOutput(result.result);
       setError('');
@@ -57,7 +57,7 @@ export default function JsonFormatter() {
       setError(result.error);
       setOutput('');
     }
-  };
+  }, [input, indent, minify, sortKeys]);
 
   const handleClear = () => {
     setInput('');
@@ -85,7 +85,7 @@ export default function JsonFormatter() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input, indent, minify, sortKeys]);
+  }, [handleFormat]);
 
   return (
     <Box>

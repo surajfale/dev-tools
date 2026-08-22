@@ -85,6 +85,9 @@ devDependencies:
   eslint-plugin-react-refresh:
     specifier: ^0.4.23
     version: 0.4.23(eslint@9.37.0)
+  globals:
+    specifier: ^17.11.0
+    version: 17.11.0
   sharp:
     specifier: ^0.33.5
     version: 0.33.5
@@ -2201,6 +2204,11 @@ packages:
 
   /globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
+    engines: {node: '>=18'}
+    dev: true
+
+  /globals@17.11.0:
+    resolution: {integrity: sha512-Z2I8hM+PbJDXQDq3Icgpzv+mPdwr68iZUU9d5WW4FuXfDUQfkZaZuvjMv42/5crNyw154+9+VWXbYrUgDXbxNw==}
     engines: {node: '>=18'}
     dev: true
 

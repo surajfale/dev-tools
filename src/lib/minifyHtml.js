@@ -7,7 +7,7 @@ export const minifyHtml = (html) => {
   let minified = html;
 
   // Remove HTML comments (but keep IE conditional comments)
-  minified = minified.replace(/<!--(?!\[if\s)(?!<!)[^\[].*?-->/gs, '');
+  minified = minified.replace(/<!--(?!\[if\s)(?!<!)[^[].*?-->/gs, '');
 
   // Remove CSS comments
   minified = minified.replace(/\/\*[\s\S]*?\*\//g, '');
