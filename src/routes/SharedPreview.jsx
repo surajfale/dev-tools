@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Box, Button, Typography, Alert, CircularProgress } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
-import { fetchHtmlFromUrl } from '../lib/uploadHtml';
 import { sanitizeHtml } from '../lib/previewHtml';
 
 export default function SharedPreview() {
@@ -13,58 +12,34 @@ export default function SharedPreview() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadHtml = async () => {
-      try {
-        // Check if content is from cloud (pastebin) or embedded in URL
-        const cloudUrl = searchParams.get('cloud');
-        const encodedHtml = searchParams.get('content');
+    try {
+      const encodedHtml = searchParams.get('content');
 
-        if (cloudUrl) {
-          // Fetch from cloud service
-          setLoading(true);
-          const result = await fetchHtmlFromUrl(decodeURIComponent(cloudUrl));
-
-          if (result.success) {
-            // Sanitize the fetched HTML
-            const sanitized = sanitizeHtml(result.html);
-            if (sanitized.success) {
-              setHtml(sanitized.result);
-            } else {
-              setError('Failed to sanitize HTML: ' + sanitized.error);
-            }
-          } else {
-            setError('Failed to load HTML from cloud: ' + result.error);
-          }
-          setLoading(false);
-        } else if (encodedHtml) {
-          // Decode base64 URL-safe string (handle Unicode)
-          const base64 = encodedHtml.replace(/-/g, '+').replace(/_/g, '/');
-          const binaryString = atob(base64);
-          const bytes = new Uint8Array(binaryString.length);
-          for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-          }
-          const decoded = new TextDecoder().decode(bytes);
-
-          // Sanitize the decoded HTML
-          const sanitized = sanitizeHtml(decoded);
-          if (sanitized.success) {
-            setHtml(sanitized.result);
-          } else {
-            setError('Failed to sanitize HTML: ' + sanitized.error);
-          }
-          setLoading(false);
-        } else {
-          setError('No preview content found in URL');
-          setLoading(false);
+      if (encodedHtml) {
+        // Decode base64 URL-safe string (handle Unicode)
+        const base64 = encodedHtml.replace(/-/g, '+').replace(/_/g, '/');
+        const binaryString = atob(base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
         }
-      } catch (err) {
-        setError('Failed to load preview: ' + err.message);
-        setLoading(false);
-      }
-    };
+        const decoded = new TextDecoder().decode(bytes);
 
-    loadHtml();
+        // Sanitize the decoded HTML
+        const sanitized = sanitizeHtml(decoded);
+        if (sanitized.success) {
+          setHtml(sanitized.result);
+        } else {
+          setError('Failed to sanitize HTML: ' + sanitized.error);
+        }
+      } else {
+        setError('No preview content found in URL');
+      }
+    } catch (err) {
+      setError('Failed to load preview: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
   }, [searchParams]);
 
   if (error) {
@@ -116,7 +91,7 @@ export default function SharedPreview() {
               border: 'none',
               backgroundColor: 'white'
             }}
-            sandbox="allow-same-origin allow-scripts"
+            sandbox="allow-scripts"
           />
         ) : (
           <Typography color="text.secondary" align="center" sx={{ mt: 10 }}>

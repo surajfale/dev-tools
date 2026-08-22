@@ -12,10 +12,9 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
-import { Clear, Visibility, Code as CodeIcon, Share, OpenInNew, CloudUpload } from '@mui/icons-material';
+import { Clear, Visibility, Code as CodeIcon, Share, OpenInNew } from '@mui/icons-material';
 import { sanitizeHtml } from '../lib/previewHtml';
 import { minifyHtml, calculateCompression } from '../lib/minifyHtml';
-import { uploadHtmlToCloud } from '../lib/uploadHtml';
 import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
@@ -74,10 +73,6 @@ export default function HtmlPreview() {
   const [shareableUrl, setShareableUrl] = useState('');
   const [showCopyAlert, setShowCopyAlert] = useState(false);
   const [compressionStats, setCompressionStats] = useState(null);
-  const [cloudUrl, setCloudUrl] = useState('');
-  const [cloudService, setCloudService] = useState('');
-  const [cloudExpiration, setCloudExpiration] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
 
   const handlePreview = useCallback(() => {
     const result = sanitizeHtml(input);
@@ -85,21 +80,15 @@ export default function HtmlPreview() {
     if (result.success) {
       setSanitizedHtml(result.result);
       setError('');
-      setActiveTab(1); // Switch to preview tab
+      setActiveTab(0); // Switch to preview tab
       // Clear previous shareable URL and stats
       setShareableUrl('');
       setCompressionStats(null);
-      setCloudUrl('');
-      setCloudService('');
-      setCloudExpiration('');
     } else {
       setError(result.error);
       setSanitizedHtml('');
       setShareableUrl('');
       setCompressionStats(null);
-      setCloudUrl('');
-      setCloudService('');
-      setCloudExpiration('');
     }
   }, [input]);
 
@@ -110,9 +99,6 @@ export default function HtmlPreview() {
     setActiveTab(0);
     setShareableUrl('');
     setCompressionStats(null);
-    setCloudUrl('');
-    setCloudService('');
-    setCloudExpiration('');
   };
 
   const handleLoadSample = () => {
@@ -184,43 +170,7 @@ export default function HtmlPreview() {
       const encodedLength = compressionStats?.minifiedSize ?
         Math.ceil(compressionStats.minifiedSize * 1.37) : // Base64 is ~37% larger
         'unknown';
-      setError(`HTML content too large for shareable link even after ${compressionStats?.reduction || 0}% compression (estimated URL: ${encodedLength} chars, max: 8000). Try "Upload & Share" instead for large files.`);
-    }
-  };
-
-  const handleUploadToCloud = async () => {
-    if (!sanitizedHtml) return;
-
-    setIsUploading(true);
-    setError('');
-    setCloudUrl(''); // Clear previous cloud URL
-    setCloudExpiration('');
-
-    try {
-      const result = await uploadHtmlToCloud(sanitizedHtml);
-
-      if (result.success) {
-        // Create our preview URL that will fetch from the cloud service
-        const previewUrl = `${window.location.origin}/preview?cloud=${encodeURIComponent(result.viewUrl)}`;
-        setCloudUrl(previewUrl);
-        setCloudService(result.service || 'cloud');
-        setCloudExpiration(result.expiration || 'unknown');
-
-        // Copy to clipboard
-        try {
-          await navigator.clipboard.writeText(previewUrl);
-          setShowCopyAlert(true);
-        } catch (clipErr) {
-          console.warn('Clipboard copy failed:', clipErr);
-          // Still show success even if clipboard fails
-        }
-      } else {
-        setError(result.error || 'Upload failed. Please try again or use the Download button to save your HTML file.');
-      }
-    } catch (err) {
-      setError('Failed to upload HTML: ' + err.message + '. Please try again later.');
-    } finally {
-      setIsUploading(false);
+      setError(`HTML content too large for a shareable link even after ${compressionStats?.reduction || 0}% compression (estimated URL: ${encodedLength} chars, max: 8000). Try the Download button instead for large files.`);
     }
   };
 
@@ -242,14 +192,12 @@ export default function HtmlPreview() {
         HTML Preview
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Paste HTML code and see it rendered live. For small files, shareable links are automatically minified. For large files, use &quot;Upload &amp; Share&quot; to get a shareable link. Use Ctrl/Cmd+Enter to preview quickly.
+        Paste HTML code and see it rendered live. Shareable links encode the (minified) HTML directly in the URL — nothing is ever uploaded anywhere. Use Ctrl/Cmd+Enter to preview quickly.
       </Typography>
 
-      <Alert severity="warning" sx={{ mb: 3 }}>
+      <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>⚠️ Privacy Notice:</strong> Do not upload sensitive or personal information.
-          Uploaded content is stored on third-party services and will be automatically deleted after 7 days.
-          Only share publicly viewable content like presentations, portfolios, or demos.
+          <strong>Privacy:</strong> Everything on this page runs entirely in your browser. Your HTML is never sent to a server, uploaded, or stored anywhere — including &quot;shareable&quot; links, which embed the content directly in the URL itself. Anyone you share a link with can see its content, so avoid pasting sensitive or personal information.
         </Typography>
       </Alert>
 
@@ -314,7 +262,7 @@ export default function HtmlPreview() {
                       border: 'none',
                       backgroundColor: 'white'
                     }}
-                    sandbox="allow-same-origin allow-scripts"
+                    sandbox="allow-scripts"
                   />
                 ) : (
                   <Typography color="text.secondary" align="center" sx={{ p: 2, mt: 20 }}>
@@ -338,39 +286,11 @@ export default function HtmlPreview() {
                       startIcon={<Share />}
                       onClick={handleCopyShareableLink}
                       aria-label="Copy shareable link"
-                      disabled={isUploading}
                     >
                       Copy Shareable Link
                     </Button>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      startIcon={<CloudUpload />}
-                      onClick={handleUploadToCloud}
-                      disabled={isUploading}
-                      aria-label="Upload to cloud and get shareable link"
-                    >
-                      {isUploading ? 'Uploading...' : 'Upload & Share'}
-                    </Button>
                   </Stack>
-                  {cloudUrl && (
-                    <Alert severity="success" sx={{ mt: 2 }}>
-                      <Typography variant="caption" display="block">
-                        <strong>✓ Uploaded to {cloudService}!</strong>
-                      </Typography>
-                      <Typography variant="caption" display="block" sx={{ mt: 1, wordBreak: 'break-all' }}>
-                        Shareable link (copied to clipboard): <br />
-                        <strong>{cloudUrl}</strong>
-                      </Typography>
-                      <Typography variant="caption" display="block" color="text.secondary" sx={{ mt: 1 }}>
-                        {cloudExpiration === 'permanent'
-                          ? '⚠️ Link is permanent - will not auto-delete'
-                          : `🗑️ Link expires in ${cloudExpiration}`
-                        }
-                      </Typography>
-                    </Alert>
-                  )}
-                  {compressionStats && shareableUrl && !cloudUrl && (
+                  {compressionStats && shareableUrl && (
                     <Alert severity={shareableUrl.length > 8000 ? "warning" : "info"} sx={{ mt: 2 }}>
                       <Typography variant="caption" display="block">
                         <strong>Automatic Compression Applied:</strong>
@@ -382,7 +302,7 @@ export default function HtmlPreview() {
                       </Typography>
                       <Typography variant="caption" display="block" color="text.secondary">
                         Final URL length: {shareableUrl.length.toLocaleString()}/8,000 chars
-                        {shareableUrl.length > 8000 ? ' ⚠️ Too long - use "Upload & Share" instead' : ' ✓ Ready to share'}
+                        {shareableUrl.length > 8000 ? ' ⚠️ Too long - use the Download button instead' : ' ✓ Ready to share'}
                       </Typography>
                     </Alert>
                   )}
