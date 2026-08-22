@@ -1,5 +1,6 @@
 import { useTheme } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
+import { Terminal } from '@mui/icons-material';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import json from 'react-syntax-highlighter/dist/esm/languages/prism/json';
 import sql from 'react-syntax-highlighter/dist/esm/languages/prism/sql';
@@ -14,7 +15,7 @@ SyntaxHighlighter.registerLanguage('yaml', yaml);
 SyntaxHighlighter.registerLanguage('markup', markup);
 SyntaxHighlighter.registerLanguage('markdown', markdown);
 
-const CODE_FONT = 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace';
+const CODE_FONT = '"JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace';
 
 /**
  * Read-only, syntax-highlighted display for formatted/converted code output.
@@ -27,7 +28,7 @@ export default function CodeBlock({ code, language, minRows = 12, placeholder, s
 
   const containerSx = {
     border: '1px solid',
-    borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)',
+    borderColor: 'divider',
     borderRadius: 1,
     overflow: 'hidden',
     minHeight,
@@ -36,8 +37,22 @@ export default function CodeBlock({ code, language, minRows = 12, placeholder, s
 
   if (!code) {
     return (
-      <Box sx={{ ...containerSx, display: 'flex', alignItems: 'flex-start', p: 2 }}>
-        <Typography color="text.secondary">{placeholder}</Typography>
+      <Box
+        sx={{
+          ...containerSx,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 1,
+          p: 3,
+          bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(15,23,42,0.015)',
+        }}
+      >
+        <Terminal sx={{ fontSize: 28, color: 'text.disabled' }} />
+        <Typography variant="body2" color="text.secondary" align="center">
+          {placeholder}
+        </Typography>
       </Box>
     );
   }
