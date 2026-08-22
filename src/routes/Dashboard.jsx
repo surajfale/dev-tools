@@ -55,7 +55,7 @@ const tools = [
   },
   {
     title: 'HTML Preview',
-    description: 'Preview HTML with live rendering. Upload to cloud for permanent shareable links (any file size).',
+    description: 'Preview HTML with live rendering. Share via a link that embeds the (minified) HTML directly — nothing leaves your browser.',
     icon: <Visibility />,
     path: '/html-preview',
     color: 'error'
