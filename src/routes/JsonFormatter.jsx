@@ -19,6 +19,7 @@ import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
+import CodeBlock from '../components/Common/CodeBlock';
 
 const sampleJson = `{
   "name": "John Doe",
@@ -180,14 +181,11 @@ export default function JsonFormatter() {
           <Typography variant="h6" gutterBottom>
             Formatted Output
           </Typography>
-          <TextField
-            value={output}
-            placeholder="Formatted JSON will appear here..."
+          <CodeBlock
+            code={output}
+            language="json"
             minRows={12}
-            InputProps={{
-              readOnly: true,
-            }}
-            aria-label="Formatted JSON output"
+            placeholder="Formatted JSON will appear here..."
           />
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <CopyButton text={output} />

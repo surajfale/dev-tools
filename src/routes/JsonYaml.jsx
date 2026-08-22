@@ -19,6 +19,7 @@ import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
+import CodeBlock from '../components/Common/CodeBlock';
 
 const sampleJson = `{
   "apiVersion": "v1",
@@ -223,14 +224,11 @@ export default function JsonYaml() {
           <Typography variant="h6" gutterBottom>
             {outputLabel}
           </Typography>
-          <TextField
-            value={output}
-            placeholder={`${isJsonToYaml ? 'YAML' : 'JSON'} output will appear here...`}
+          <CodeBlock
+            code={output}
+            language={isJsonToYaml ? 'yaml' : 'json'}
             minRows={12}
-            InputProps={{
-              readOnly: true,
-            }}
-            aria-label={outputLabel}
+            placeholder={`${isJsonToYaml ? 'YAML' : 'JSON'} output will appear here...`}
           />
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <CopyButton text={output} />

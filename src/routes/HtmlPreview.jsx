@@ -20,6 +20,7 @@ import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
+import CodeBlock from '../components/Common/CodeBlock';
 
 const sampleHtml = `<!DOCTYPE html>
 <html>
@@ -392,14 +393,11 @@ export default function HtmlPreview() {
 
           {activeTab === 1 && (
             <Box>
-              <TextField
-                value={sanitizedHtml}
-                placeholder="Sanitized HTML will appear here..."
+              <CodeBlock
+                code={sanitizedHtml}
+                language="markup"
                 minRows={20}
-                InputProps={{
-                  readOnly: true,
-                }}
-                aria-label="Sanitized HTML output"
+                placeholder="Sanitized HTML will appear here..."
               />
               <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
                 <CopyButton text={sanitizedHtml} />

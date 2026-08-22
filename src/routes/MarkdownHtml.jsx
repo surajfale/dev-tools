@@ -19,6 +19,7 @@ import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
+import CodeBlock from '../components/Common/CodeBlock';
 
 const sampleMarkdown = `# Sample Markdown Document
 
@@ -208,14 +209,11 @@ export default function MarkdownHtml() {
           <Typography variant="h6" gutterBottom>
             {outputLabel}
           </Typography>
-          <TextField
-            value={output}
-            placeholder={`${isMarkdownToHtml ? 'HTML' : 'Markdown'} output will appear here...`}
+          <CodeBlock
+            code={output}
+            language={isMarkdownToHtml ? 'markup' : 'markdown'}
             minRows={12}
-            InputProps={{
-              readOnly: true,
-            }}
-            aria-label={outputLabel}
+            placeholder={`${isMarkdownToHtml ? 'HTML' : 'Markdown'} output will appear here...`}
           />
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <CopyButton text={output} />
