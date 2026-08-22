@@ -4,6 +4,9 @@
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -31,7 +34,7 @@
     "marked": "^11.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.30.6",
+    "react-router-dom": "^7.18.2",
     "react-syntax-highlighter": "^15.6.1",
     "sql-formatter": "^15.8.2"
   },
@@ -46,8 +49,8 @@
     "globals": "^17.11.0",
     "jsdom": "^30.0.1",
     "sharp": "^0.35.3",
-    "vite": "^5.4.21",
-    "vitest": "^2.1.9"
+    "vite": "^6.4.3",
+    "vitest": "^3.2.7"
   },
   "pnpm": {
     "overrides": {

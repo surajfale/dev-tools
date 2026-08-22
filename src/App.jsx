@@ -42,7 +42,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <Router>
         <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route path="/preview" element={<SharedPreview />} />
