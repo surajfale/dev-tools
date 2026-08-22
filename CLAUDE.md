@@ -24,6 +24,12 @@ pnpm preview
 # Lint code (ESLint with React-specific rules)
 pnpm lint
 
+# Run the unit test suite (Vitest, jsdom environment)
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
 # Deploy to Netlify (build + deploy)
 pnpm deploy:netlify
 ```
