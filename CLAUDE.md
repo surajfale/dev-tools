@@ -24,6 +24,12 @@ pnpm preview
 # Lint code (ESLint with React-specific rules)
 pnpm lint
 
+# Run the unit test suite (Vitest, jsdom environment)
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
 # Deploy to Netlify (build + deploy)
 pnpm deploy:netlify
 ```
@@ -191,11 +197,10 @@ Always consider the app's core features (JSON/SQL formatting, timestamp conversi
 ## Additional Tool-Specific Patterns
 
 ### HTML Preview Tool
-- Uses iframe with `sandbox="allow-same-origin allow-scripts"` for isolated rendering
-- Cloud upload to dpaste.com (7-day expiration) with fallback to paste.ee/rentry
-- CORS proxy fallback for fetching shared content
-- HTML minification reduces size by 30-60% for shareable links
-- Privacy warning displayed to users about not uploading sensitive data
+- 100% client-side: nothing is ever sent to a server or a third party. Do not reintroduce a cloud-upload/pastebin feature — it was deliberately removed for this reason.
+- Uses iframe with `sandbox="allow-scripts"` (no `allow-same-origin`) so previewed HTML runs in an isolated opaque origin and cannot reach into the app's own origin/storage
+- Shareable links embed minified HTML directly in the URL (`/preview?content=<base64>`) via `src/lib/minifyHtml.js` — reduces size 30-60% to fit the ~8000 char URL limit
+- Privacy notice displayed to users: content lives entirely in the URL, so anyone with the link can see it
 
 ### Math Calculator
 - Parses numbers separated by comma, space, or newline

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -19,6 +19,7 @@ import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
+import CodeBlock from '../components/Common/CodeBlock';
 
 const sampleJson = `{
   "name": "John Doe",
@@ -46,9 +47,9 @@ export default function JsonFormatter() {
   const [minify, setMinify] = useState(false);
   const [sortKeys, setSortKeys] = useState(false);
 
-  const handleFormat = () => {
+  const handleFormat = useCallback(() => {
     const result = formatJson(input, { indent, minify, sortKeys });
-    
+
     if (result.success) {
       setOutput(result.result);
       setError('');
@@ -56,7 +57,7 @@ export default function JsonFormatter() {
       setError(result.error);
       setOutput('');
     }
-  };
+  }, [input, indent, minify, sortKeys]);
 
   const handleClear = () => {
     setInput('');
@@ -84,7 +85,7 @@ export default function JsonFormatter() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input, indent, minify, sortKeys]);
+  }, [handleFormat]);
 
   return (
     <Box>
@@ -180,14 +181,11 @@ export default function JsonFormatter() {
           <Typography variant="h6" gutterBottom>
             Formatted Output
           </Typography>
-          <TextField
-            value={output}
-            placeholder="Formatted JSON will appear here..."
+          <CodeBlock
+            code={output}
+            language="json"
             minRows={12}
-            InputProps={{
-              readOnly: true,
-            }}
-            aria-label="Formatted JSON output"
+            placeholder="Formatted JSON will appear here..."
           />
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <CopyButton text={output} />

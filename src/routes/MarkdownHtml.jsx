@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -19,6 +19,7 @@ import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
+import CodeBlock from '../components/Common/CodeBlock';
 
 const sampleMarkdown = `# Sample Markdown Document
 
@@ -81,19 +82,19 @@ export default function MarkdownHtml() {
   const [error, setError] = useState('');
   const [direction, setDirection] = useState('md-to-html');
 
-  const handleConvert = () => {
+  const handleConvert = useCallback(() => {
     let result;
-    
+
     if (direction === 'md-to-html') {
       result = convertMarkdownToHtml(input);
     } else {
       result = convertHtmlToMarkdown(input);
     }
-    
+
     if (result.success) {
       setOutput(result.result);
       setError('');
-      
+
       // Set preview for markdown to HTML conversion
       if (direction === 'md-to-html') {
         setPreview(result.result);
@@ -105,7 +106,7 @@ export default function MarkdownHtml() {
       setOutput('');
       setPreview('');
     }
-  };
+  }, [input, direction]);
 
   const handleClear = () => {
     setInput('');
@@ -141,7 +142,7 @@ export default function MarkdownHtml() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input, direction]);
+  }, [handleConvert]);
 
   const isMarkdownToHtml = direction === 'md-to-html';
   const inputLabel = isMarkdownToHtml ? 'Markdown Input' : 'HTML Input';
@@ -208,14 +209,11 @@ export default function MarkdownHtml() {
           <Typography variant="h6" gutterBottom>
             {outputLabel}
           </Typography>
-          <TextField
-            value={output}
-            placeholder={`${isMarkdownToHtml ? 'HTML' : 'Markdown'} output will appear here...`}
+          <CodeBlock
+            code={output}
+            language={isMarkdownToHtml ? 'markup' : 'markdown'}
             minRows={12}
-            InputProps={{
-              readOnly: true,
-            }}
-            aria-label={outputLabel}
+            placeholder={`${isMarkdownToHtml ? 'HTML' : 'Markdown'} output will appear here...`}
           />
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <CopyButton text={output} />

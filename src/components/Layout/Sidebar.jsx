@@ -1,12 +1,13 @@
-import { 
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
   ListItemText,
   Toolbar,
-  Box
+  Box,
+  Typography
 } from '@mui/material';
 import {
   Dashboard,
@@ -22,8 +23,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const drawerWidth = 240;
 
-const menuItems = [
+const navItems = [
   { text: 'Dashboard', path: '/', icon: <Dashboard /> },
+];
+
+const toolItems = [
   { text: 'JSON Formatter', path: '/json-formatter', icon: <Code /> },
   { text: 'SQL Formatter', path: '/sql-formatter', icon: <Storage /> },
   { text: 'Timestamp Converter', path: '/timestamp-converter', icon: <Schedule /> },
@@ -46,27 +50,49 @@ export default function Sidebar({
     onMobileClose?.();
   };
 
+  const renderItem = (item) => {
+    const isActive = location.pathname === item.path;
+    return (
+      <ListItem key={item.text} disablePadding sx={{ mb: 0.25 }}>
+        <ListItemButton
+          onClick={() => handleNavigation(item.path)}
+          selected={isActive}
+          aria-current={isActive ? 'page' : undefined}
+        >
+          <ListItemIcon sx={{ minWidth: 40, color: isActive ? 'primary.main' : 'inherit' }}>
+            {item.icon}
+          </ListItemIcon>
+          <ListItemText
+            primary={item.text}
+            primaryTypographyProps={{ fontSize: '0.9rem' }}
+          />
+        </ListItemButton>
+      </ListItem>
+    );
+  };
+
   const drawer = (
     <Box role="navigation" aria-label="Main navigation">
       <Toolbar />
-      <List>
-        {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
-          return (
-            <ListItem key={item.text} disablePadding>
-              <ListItemButton
-                onClick={() => handleNavigation(item.path)}
-                selected={isActive}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                <ListItemIcon>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
+      <List sx={{ px: 0.5, pt: 1 }}>
+        {navItems.map(renderItem)}
+      </List>
+      <Typography
+        variant="caption"
+        sx={{
+          display: 'block',
+          px: 3,
+          pt: 1.5,
+          pb: 0.5,
+          color: 'text.disabled',
+          fontWeight: 600,
+          letterSpacing: '0.08em',
+        }}
+      >
+        TOOLS
+      </Typography>
+      <List sx={{ px: 0.5 }}>
+        {toolItems.map(renderItem)}
       </List>
     </Box>
   );

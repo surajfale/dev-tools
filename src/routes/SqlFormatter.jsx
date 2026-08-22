@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -19,6 +19,7 @@ import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
+import CodeBlock from '../components/Common/CodeBlock';
 
 const sampleSql = `SELECT u.id, u.name, u.email, p.title as post_title, p.created_at FROM users u LEFT JOIN posts p ON u.id = p.user_id WHERE u.active = 1 AND p.published = true ORDER BY p.created_at DESC LIMIT 10;`;
 
@@ -30,9 +31,9 @@ export default function SqlFormatter() {
   const [uppercase, setUppercase] = useState(true);
   const [indentSize, setIndentSize] = useState(2);
 
-  const handleFormat = () => {
+  const handleFormat = useCallback(() => {
     const result = formatSql(input, { dialect, uppercase, indentSize });
-    
+
     if (result.success) {
       setOutput(result.result);
       setError('');
@@ -40,7 +41,7 @@ export default function SqlFormatter() {
       setError(result.error);
       setOutput('');
     }
-  };
+  }, [input, dialect, uppercase, indentSize]);
 
   const handleClear = () => {
     setInput('');
@@ -63,7 +64,7 @@ export default function SqlFormatter() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input, dialect, uppercase, indentSize]);
+  }, [handleFormat]);
 
   return (
     <Box>
@@ -155,14 +156,11 @@ export default function SqlFormatter() {
           <Typography variant="h6" gutterBottom>
             Formatted Output
           </Typography>
-          <TextField
-            value={output}
-            placeholder="Formatted SQL will appear here..."
+          <CodeBlock
+            code={output}
+            language="sql"
             minRows={12}
-            InputProps={{
-              readOnly: true,
-            }}
-            aria-label="Formatted SQL output"
+            placeholder="Formatted SQL will appear here..."
           />
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <CopyButton text={output} />

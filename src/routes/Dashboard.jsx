@@ -12,7 +12,8 @@ import {
   Article,
   SwapHoriz,
   Visibility,
-  Calculate
+  Calculate,
+  ArrowForward
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
@@ -74,14 +75,13 @@ export default function Dashboard() {
   return (
     <Box>
       <Typography variant="h4" component="h1" gutterBottom>
-        Developer Tools Dashboard
+        Developer Tools
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        A collection of essential developer utilities to streamline your workflow. 
-        Choose a tool below to get started.
+        {tools.length} essential utilities to format, convert, and inspect data — all in the browser, nothing leaves your machine.
       </Typography>
-      
-      <Grid container spacing={3} sx={{ mt: 2 }}>
+
+      <Grid container spacing={3} sx={{ mt: 0.5 }}>
         {tools.map((tool) => (
           <Grid item xs={12} sm={6} md={4} key={tool.path}>
             <Card
@@ -90,28 +90,74 @@ export default function Dashboard() {
                 display: 'flex',
                 flexDirection: 'column',
                 cursor: 'pointer',
-                transition: 'transform 0.2s ease-in-out',
+                outlineOffset: 2,
+                '&:focus-visible': {
+                  outline: (theme) => `2px solid ${theme.palette.primary.main}`,
+                },
                 '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: 4,
+                  borderColor: `${tool.color}.main`,
+                  boxShadow: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? '0 8px 24px rgba(0,0,0,0.4)'
+                      : '0 8px 24px rgba(15,23,42,0.1)',
+                  '@media (prefers-reduced-motion: no-preference)': {
+                    transform: 'translateY(-3px)',
+                  },
+                  '& .tool-cta': {
+                    color: `${tool.color}.main`,
+                    transform: 'translateX(2px)',
+                  },
+                },
+              }}
+              onClick={() => navigate(tool.path)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate(tool.path);
                 }
               }}
-              elevation={2}
-              onClick={() => navigate(tool.path)}
               aria-label={`Open ${tool.title}`}
             >
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Box sx={{ color: `${tool.color}.main`, mr: 1 }}>
-                    {tool.icon}
-                  </Box>
-                  <Typography variant="h6" component="h2">
-                    {tool.title}
-                  </Typography>
+              <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 44,
+                    height: 44,
+                    borderRadius: 1.5,
+                    mb: 2,
+                    bgcolor: (theme) => alphaBg(theme, tool.color),
+                    color: `${tool.color}.main`,
+                  }}
+                >
+                  {tool.icon}
                 </Box>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="h6" component="h2" gutterBottom>
+                  {tool.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
                   {tool.description}
                 </Typography>
+                <Box
+                  className="tool-cta"
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    mt: 2,
+                    color: 'text.secondary',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    transition: 'transform 180ms ease, color 180ms ease',
+                  }}
+                >
+                  Open tool
+                  <ArrowForward sx={{ fontSize: 16 }} />
+                </Box>
               </CardContent>
             </Card>
           </Grid>
@@ -119,4 +165,12 @@ export default function Dashboard() {
       </Grid>
     </Box>
   );
+}
+
+function alphaBg(theme, color) {
+  const channel = theme.palette[color]?.main;
+  if (!channel) return theme.palette.action.hover;
+  return theme.palette.mode === 'dark'
+    ? `${channel}26`
+    : `${channel}1A`;
 }

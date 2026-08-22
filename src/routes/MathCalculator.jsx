@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -26,7 +26,7 @@ export default function MathCalculator() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
-  const handleCalculate = () => {
+  const handleCalculate = useCallback(() => {
     const calculation = calculateSum(input);
 
     if (calculation.success) {
@@ -36,7 +36,7 @@ export default function MathCalculator() {
       setError(calculation.error);
       setResult(null);
     }
-  };
+  }, [input]);
 
   const handleClear = () => {
     setInput('');
@@ -59,7 +59,7 @@ export default function MathCalculator() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input]);
+  }, [handleCalculate]);
 
   return (
     <Box>

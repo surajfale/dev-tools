@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Typography,
   Grid,
@@ -19,6 +19,7 @@ import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
+import CodeBlock from '../components/Common/CodeBlock';
 
 const sampleJson = `{
   "apiVersion": "v1",
@@ -73,15 +74,15 @@ export default function JsonYaml() {
   const [indent, setIndent] = useState(2);
   const [minify, setMinify] = useState(false);
 
-  const handleConvert = () => {
+  const handleConvert = useCallback(() => {
     let result;
-    
+
     if (direction === 'json-to-yaml') {
       result = convertJsonToYaml(input);
     } else {
       result = convertYamlToJson(input, { indent, minify });
     }
-    
+
     if (result.success) {
       setOutput(result.result);
       setError('');
@@ -89,7 +90,7 @@ export default function JsonYaml() {
       setError(result.error);
       setOutput('');
     }
-  };
+  }, [input, direction, indent, minify]);
 
   const handleClear = () => {
     setInput('');
@@ -123,7 +124,7 @@ export default function JsonYaml() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [input, direction, indent, minify]);
+  }, [handleConvert]);
 
   const isJsonToYaml = direction === 'json-to-yaml';
   const inputLabel = isJsonToYaml ? 'JSON Input' : 'YAML Input';
@@ -223,14 +224,11 @@ export default function JsonYaml() {
           <Typography variant="h6" gutterBottom>
             {outputLabel}
           </Typography>
-          <TextField
-            value={output}
-            placeholder={`${isJsonToYaml ? 'YAML' : 'JSON'} output will appear here...`}
+          <CodeBlock
+            code={output}
+            language={isJsonToYaml ? 'yaml' : 'json'}
             minRows={12}
-            InputProps={{
-              readOnly: true,
-            }}
-            aria-label={outputLabel}
+            placeholder={`${isJsonToYaml ? 'YAML' : 'JSON'} output will appear here...`}
           />
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <CopyButton text={output} />
