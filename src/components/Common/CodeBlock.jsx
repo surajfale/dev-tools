@@ -10,6 +10,8 @@ import markup from 'react-syntax-highlighter/dist/esm/languages/prism/markup';
 import markdown from 'react-syntax-highlighter/dist/esm/languages/prism/markdown';
 import { FONT_MONO as CODE_FONT, bracketBackground } from '../../theme';
 import { planReveal, prefersReducedMotion } from '../../lib/typewriter';
+import { shouldTypeOutput } from '../../lib/settings';
+import { useSettings } from './settingsContext';
 
 SyntaxHighlighter.registerLanguage('json', json);
 SyntaxHighlighter.registerLanguage('sql', sql);
@@ -58,9 +60,10 @@ function missionPrism(t) {
 /**
  * Reveals new output line by line, like a terminal printing it. The first
  * value shown on mount is not animated, outputs over the cap appear at once
- * (see planReveal), and reduced-motion users always get the result instantly.
+ * (see planReveal), and `enabled` (from the user's typing setting) can turn
+ * it off entirely. Switching it off mid-reveal shows the full output.
  */
-function useTypingReveal(code) {
+function useTypingReveal(code, enabled) {
   const [shown, setShown] = useState(code);
   const previous = useRef(code);
 
@@ -68,7 +71,7 @@ function useTypingReveal(code) {
     const changed = code !== previous.current;
     previous.current = code;
     const lines = code ? code.split('\n') : [];
-    const plan = changed && code && !prefersReducedMotion() ? planReveal(lines.length) : null;
+    const plan = changed && code && enabled ? planReveal(lines.length) : null;
 
     if (!plan) {
       setShown(code);
@@ -87,7 +90,7 @@ function useTypingReveal(code) {
       }
     }, plan.interval);
     return () => clearInterval(id);
-  }, [code]);
+  }, [code, enabled]);
 
   return { shown, typing: Boolean(code) && shown !== code };
 }
@@ -100,7 +103,8 @@ export default function CodeBlock({ code, language, minRows = 12, placeholder, s
   const theme = useTheme();
   const t = theme.palette.tokens;
   const minHeight = `${minRows * 1.4375 + 2}em`;
-  const { shown, typing } = useTypingReveal(code);
+  const { settings } = useSettings();
+  const { shown, typing } = useTypingReveal(code, shouldTypeOutput(settings.typing, prefersReducedMotion()));
 
   const containerSx = {
     border: 1,

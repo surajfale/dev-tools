@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import { drawerWidth } from './Sidebar';
+import SettingsMenu from './SettingsMenu';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -106,6 +107,7 @@ export default function Header({ onMenuClick, isDarkMode, onThemeToggle }) {
           ))}
         </Box>
 
+        <SettingsMenu sx={{ ...cell, width: 52 }} />
         <Tooltip title={themeLabel}>
           <IconButton color="inherit" onClick={onThemeToggle} aria-label={themeLabel} sx={{ ...cell, width: 56 }}>
             {isDarkMode ? <LightModeOutlined fontSize="small" /> : <DarkModeOutlined fontSize="small" />}

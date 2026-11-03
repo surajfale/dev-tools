@@ -79,6 +79,7 @@ src/
 │   │   ├── Footer.jsx          # Footer with credits
 │   │   ├── toolRegistry.jsx    # Single source of truth for tool metadata
 │   │   ├── BootSequence.jsx    # Once-per-session intro overlay
+│   │   ├── SettingsMenu.jsx    # Header settings menu (output typing mode)
 │   │   └── Layout.jsx          # Main layout wrapper
 │   └── Common/                 # Reusable utility components
 │       ├── CopyButton.jsx      # Clipboard functionality
@@ -87,6 +88,8 @@ src/
 │       ├── PageHeader.jsx      # Spec-sheet tool header (T/0n, title, kbd hint)
 │       ├── CodeBlock.jsx       # Syntax-highlighted output with typing reveal
 │       ├── OrbitRings.jsx      # Decorative orbit diagram (dashboard hero)
+│       ├── SettingsProvider.jsx # User settings state + localStorage sync
+│       ├── settingsContext.js  # SettingsContext + useSettings() hook
 │       └── SampleInputButton.jsx # Load sample data
 └── lib/                        # Business logic utilities
     ├── formatJson.js           # JSON formatting/minifying
@@ -98,11 +101,13 @@ src/
     ├── minifyHtml.js           # HTML minification (30-60% reduction)
     ├── uploadHtml.js           # Cloud upload to pastebin services
     ├── calculateSum.js         # Math calculation utilities
+    ├── settings.js             # Settings defaults, validation, persistence
     └── typewriter.js           # Output reveal timing + reduced-motion check
 ```
 
 ### State Management Patterns
 - **Theme State**: App-level state with localStorage persistence and system preference detection
+- **User Settings**: `SettingsProvider` (wraps the router in `App.jsx`) holds non-theme preferences, persisted to localStorage under `devtools-settings`; read them with `useSettings()` from `components/Common/settingsContext.js`. Validation/persistence helpers are pure functions in `src/lib/settings.js`. UI lives in `Layout/SettingsMenu.jsx` (header). Add new preferences to `normalizeSettings()` so bad stored values fall back to defaults
 - **Tool State**: Local component state using `useState` hooks
 - **Form Handling**: Controlled components with validation
 - **Error Boundaries**: Material UI error alerts for user feedback
@@ -133,7 +138,7 @@ Each tool follows this pattern:
 - Motion lives in three components only, and all of them respect `prefers-reduced-motion`:
   - `Layout/BootSequence.jsx` — ~1s intro, once per browser session (sessionStorage), any key/click skips
   - `Common/OrbitRings.jsx` — decorative orbit diagram on the dashboard (aria-hidden)
-  - `Common/CodeBlock.jsx` — new output types in line by line; timing planned by `src/lib/typewriter.js` (≈700ms, ≤40 re-renders, skipped above 200 lines)
+  - `Common/CodeBlock.jsx` — new output types in line by line; timing planned by `src/lib/typewriter.js` (≈700ms, ≤40 re-renders, skipped above 200 lines). Governed by the user's **Output typing** setting (`auto` follows reduced-motion, `always`, `off`)
 - Tool metadata (number, tag, title, description, icon) lives in `src/components/Layout/toolRegistry.jsx` — consumed by Sidebar, Dashboard and `PageHeader`
 - Every tool page starts with `<PageHeader title="…">description</PageHeader>` (`src/components/Common/PageHeader.jsx`)
 - Copy uses dry system-status wording (`SYS.NOMINAL · 0 uplinks`)
