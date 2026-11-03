@@ -1,13 +1,17 @@
-Place launcher icons here to enable install and splash screen branding:
+App icons — Mission Control mark (graphite, amber slash, orbit ring + body)
 
-- icon-192.png      (192x192 PNG, maskable-safe)
-- icon-512.png      (512x512 PNG, maskable-safe)
-- icon-monochrome.png (512x512 PNG, solid single-color for Android themed icons)
+Edit the SVG sources, then regenerate every raster with:  pnpm generate:icons
 
-Tips:
-- Use a maskable icon to avoid cropping on Android launchers: https://maskable.app/editor
-- Keep important content within the safe area. Background can extend to the edges.
-- Monochrome icon should be a single solid color with transparency.
+Sources (edit these):
+  ../favicon.svg          browser tab; simplified for 16–32px (no ring — it blurs)
+  icon.svg                "any" app icon; full square with amber corner brackets
+  icon-maskable.svg       Android adaptive icon; everything inside the 80% safe
+                          zone (radius 205 of 512), no corner brackets
+  icon-monochrome.svg     Android themed icon; only alpha is used
 
-After adding these files, rebuild and test install via Chrome: Menu → Add to Home screen.
+Generated (do not hand-edit):
+  ../favicon.ico (16/32/48, PNG-in-ICO)   ../apple-touch-icon.png (180, opaque)
+  icon-192.png  icon-512.png  icon-maskable-192.png  icon-maskable-512.png
+  icon-monochrome.png
 
+Check maskable cropping at https://maskable.app/editor before shipping changes.

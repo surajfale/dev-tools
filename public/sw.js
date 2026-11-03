@@ -1,4 +1,6 @@
-const CACHE_NAME = 'dev-tools-cache-v1';
+// Bump when shipped assets change identity (v2: Mission Control icons) so
+// installed clients drop stale cached copies on activate.
+const CACHE_NAME = 'dev-tools-cache-v2';
 const PRECACHE_URLS = [
   '/',
   '/index.html',

@@ -142,6 +142,7 @@ Each tool follows this pattern:
 - Tool metadata (number, tag, title, description, icon) lives in `src/components/Layout/toolRegistry.jsx` — consumed by Sidebar, Dashboard and `PageHeader`
 - Every tool page starts with `<PageHeader title="…">description</PageHeader>` (`src/components/Common/PageHeader.jsx`)
 - Copy uses dry system-status wording (`SYS.NOMINAL · 0 uplinks`)
+- Icons: edit the SVG sources (`public/favicon.svg`, `public/icons/icon.svg`, `icon-maskable.svg`, `icon-monochrome.svg`) and run `pnpm generate:icons` to regenerate every PNG plus `favicon.ico` (see `public/icons/README.txt`). Maskable art must stay inside the 80% safe zone; the favicon omits the orbit ring because it blurs below 32px. Bump `CACHE_NAME` in `public/sw.js` when icons change so installed clients drop stale copies
 - Don't hardcode colors/radii/shadows in components; check new color pairs for WCAG AA in both modes
 
 ### Material UI Integration
