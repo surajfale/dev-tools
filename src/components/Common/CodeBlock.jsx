@@ -98,19 +98,35 @@ function useTypingReveal(code, enabled) {
 /**
  * Read-only, syntax-highlighted display for formatted/converted code output.
  * Mirrors the outlined TextField it sits next to so layouts don't shift.
+ *
+ * - `fill`: grow to the parent's height and scroll inside (used by OutputPopout)
+ * - `animate`: set false where a code change is a view toggle rather than a
+ *   new result, so it never replays the typing reveal
  */
-export default function CodeBlock({ code, language, minRows = 12, placeholder, showLineNumbers = true }) {
+export default function CodeBlock({
+  code,
+  language,
+  minRows = 12,
+  placeholder,
+  showLineNumbers = true,
+  fill = false,
+  animate = true,
+}) {
   const theme = useTheme();
   const t = theme.palette.tokens;
-  const minHeight = `${minRows * 1.4375 + 2}em`;
+  const minHeight = fill ? '100%' : `${minRows * 1.4375 + 2}em`;
   const { settings } = useSettings();
-  const { shown, typing } = useTypingReveal(code, shouldTypeOutput(settings.typing, prefersReducedMotion()));
+  const { shown, typing } = useTypingReveal(
+    code,
+    animate && shouldTypeOutput(settings.typing, prefersReducedMotion()),
+  );
 
   const containerSx = {
     border: 1,
     borderColor: 'divider',
-    overflow: 'hidden',
+    overflow: fill ? 'auto' : 'hidden',
     minHeight,
+    ...(fill && { height: '100%' }),
     background: bracketBackground(t.accentText, t.paper),
   };
 

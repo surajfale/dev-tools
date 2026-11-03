@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Typography,
   Grid,
@@ -21,32 +21,77 @@ import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
 import CodeBlock from '../components/Common/CodeBlock';
 import PageHeader from '../components/Common/PageHeader';
+import OutputPopout, { PopoutButton } from '../components/Common/OutputPopout';
 
 const sampleSql = `SELECT u.id, u.name, u.email, p.title as post_title, p.created_at FROM users u LEFT JOIN posts p ON u.id = p.user_id WHERE u.active = 1 AND p.published = true ORDER BY p.created_at DESC LIMIT 10;`;
 
+/**
+ * Dialect / Indent / Uppercase controls, rendered on the page and in the
+ * full-screen popout against the same state. `idPrefix` keeps ids unique.
+ */
+function SqlOptions({ idPrefix, dialect, onDialect, indentSize, onIndentSize, uppercase, onUppercase }) {
+  return (
+    <>
+      <FormControl size="small" sx={{ minWidth: 170 }}>
+        <InputLabel id={`${idPrefix}-dialect-label`}>SQL Dialect</InputLabel>
+        <Select labelId={`${idPrefix}-dialect-label`} value={dialect} label="SQL Dialect" onChange={(e) => onDialect(e.target.value)}>
+          {sqlDialects.map((d) => (
+            <MenuItem key={d.value} value={d.value}>
+              {d.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl size="small" sx={{ minWidth: 150 }}>
+        <InputLabel id={`${idPrefix}-indent-label`}>Indent Size</InputLabel>
+        <Select labelId={`${idPrefix}-indent-label`} value={indentSize} label="Indent Size" onChange={(e) => onIndentSize(e.target.value)}>
+          <MenuItem value={2}>2 spaces</MenuItem>
+          <MenuItem value={4}>4 spaces</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControlLabel
+        control={<Switch checked={uppercase} onChange={(e) => onUppercase(e.target.checked)} />}
+        label="Uppercase Keywords"
+      />
+    </>
+  );
+}
+
 export default function SqlFormatter() {
   const [input, setInput] = useState('');
-  const [output, setOutput] = useState('');
+  // The input behind the current result; output is derived from it so option
+  // changes re-apply instantly on the page and in the popout.
+  const [source, setSource] = useState(null);
   const [error, setError] = useState('');
   const [dialect, setDialect] = useState('sql');
   const [uppercase, setUppercase] = useState(true);
   const [indentSize, setIndentSize] = useState(2);
+  const [popoutOpen, setPopoutOpen] = useState(false);
+
+  // Unlike JSON, a dialect switch can make previously-valid SQL unparseable,
+  // so derivation keeps the error rather than silently showing nothing.
+  const derived = useMemo(
+    () => (source === null ? null : formatSql(source, { dialect, uppercase, indentSize })),
+    [source, dialect, uppercase, indentSize],
+  );
+  const output = derived?.success ? derived.result : '';
+  const shownError = error || (derived && !derived.success ? derived.error : '');
 
   const handleFormat = useCallback(() => {
     const result = formatSql(input, { dialect, uppercase, indentSize });
 
     if (result.success) {
-      setOutput(result.result);
+      setSource(input);
       setError('');
     } else {
       setError(result.error);
-      setOutput('');
+      setSource(null);
     }
   }, [input, dialect, uppercase, indentSize]);
 
   const handleClear = () => {
     setInput('');
-    setOutput('');
+    setSource(null);
     setError('');
   };
 
@@ -67,55 +112,23 @@ export default function SqlFormatter() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleFormat]);
 
+  const optionProps = {
+    dialect,
+    onDialect: setDialect,
+    indentSize,
+    onIndentSize: setIndentSize,
+    uppercase,
+    onUppercase: setUppercase,
+  };
+
   return (
     <Box>
       <PageHeader title="SQL Formatter">
-        Format and beautify SQL queries with support for multiple dialects.
+        Format and beautify SQL queries with support for multiple dialects. Options apply instantly to the current result.
       </PageHeader>
 
-      <Box sx={{ mb: 3 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel>SQL Dialect</InputLabel>
-              <Select
-                value={dialect}
-                label="SQL Dialect"
-                onChange={(e) => setDialect(e.target.value)}
-              >
-                {sqlDialects.map((d) => (
-                  <MenuItem key={d.value} value={d.value}>
-                    {d.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Indent Size</InputLabel>
-              <Select
-                value={indentSize}
-                label="Indent Size"
-                onChange={(e) => setIndentSize(e.target.value)}
-              >
-                <MenuItem value={2}>2 spaces</MenuItem>
-                <MenuItem value={4}>4 spaces</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={uppercase}
-                  onChange={(e) => setUppercase(e.target.checked)}
-                />
-              }
-              label="Uppercase Keywords"
-            />
-          </Grid>
-        </Grid>
+      <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 3 }}>
+        <SqlOptions idPrefix="page" {...optionProps} />
       </Box>
 
       <Grid container spacing={3}>
@@ -163,11 +176,23 @@ export default function SqlFormatter() {
           <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
             <CopyButton text={output} />
             <DownloadButton text={output} filename="formatted.sql" />
+            <PopoutButton onClick={() => setPopoutOpen(true)} disabled={!output} />
           </Stack>
         </Grid>
       </Grid>
 
-      <ErrorAlert error={error} />
+      <ErrorAlert error={shownError} />
+
+      <OutputPopout
+        open={popoutOpen}
+        onClose={() => setPopoutOpen(false)}
+        title="Formatted SQL"
+        code={output}
+        language="sql"
+        filename="formatted.sql"
+        toolbar={<SqlOptions idPrefix="popout" {...optionProps} />}
+        error={shownError}
+      />
     </Box>
   );
 }
