@@ -1,47 +1,12 @@
-import {
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Box,
-  Typography
-} from '@mui/material';
-import {
-  Dashboard,
-  Code,
-  Storage,
-  Schedule,
-  Article,
-  SwapHoriz,
-  Visibility,
-  Calculate
-} from '@mui/icons-material';
+import { Drawer, List, ListItem, ListItemButton, Toolbar, Box, Typography } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { tools } from './toolRegistry';
 
-const drawerWidth = 240;
+export const drawerWidth = 248;
 
-const navItems = [
-  { text: 'Dashboard', path: '/', icon: <Dashboard /> },
-];
+const items = [{ code: '00', short: 'Index', path: '/' }, ...tools];
 
-const toolItems = [
-  { text: 'JSON Formatter', path: '/json-formatter', icon: <Code /> },
-  { text: 'SQL Formatter', path: '/sql-formatter', icon: <Storage /> },
-  { text: 'Timestamp Converter', path: '/timestamp-converter', icon: <Schedule /> },
-  { text: 'Markdown ↔ HTML', path: '/markdown-html', icon: <Article /> },
-  { text: 'JSON ↔ YAML', path: '/json-yaml', icon: <SwapHoriz /> },
-  { text: 'HTML Preview', path: '/html-preview', icon: <Visibility /> },
-  { text: 'Math Calculator', path: '/math-calculator', icon: <Calculate /> },
-];
-
-export default function Sidebar({ 
-  mobileOpen, 
-  onMobileClose, 
-  window 
-}) {
+export default function Sidebar({ mobileOpen, onMobileClose }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -50,83 +15,96 @@ export default function Sidebar({
     onMobileClose?.();
   };
 
-  const renderItem = (item) => {
-    const isActive = location.pathname === item.path;
-    return (
-      <ListItem key={item.text} disablePadding sx={{ mb: 0.25 }}>
-        <ListItemButton
-          onClick={() => handleNavigation(item.path)}
-          selected={isActive}
-          aria-current={isActive ? 'page' : undefined}
-        >
-          <ListItemIcon sx={{ minWidth: 40, color: isActive ? 'primary.main' : 'inherit' }}>
-            {item.icon}
-          </ListItemIcon>
-          <ListItemText
-            primary={item.text}
-            primaryTypographyProps={{ fontSize: '0.9rem' }}
-          />
-        </ListItemButton>
-      </ListItem>
-    );
-  };
-
   const drawer = (
-    <Box role="navigation" aria-label="Main navigation">
-      <Toolbar />
-      <List sx={{ px: 0.5, pt: 1 }}>
-        {navItems.map(renderItem)}
-      </List>
-      <Typography
-        variant="caption"
-        sx={{
-          display: 'block',
-          px: 3,
-          pt: 1.5,
-          pb: 0.5,
-          color: 'text.disabled',
-          fontWeight: 600,
-          letterSpacing: '0.08em',
-        }}
-      >
-        TOOLS
+    <Box role="navigation" aria-label="Main navigation" sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Toolbar sx={{ minHeight: { xs: 56, sm: 60 } }} />
+      <Typography variant="overline" color="text.secondary" sx={{ px: 2, pt: 2.5, pb: 1, display: 'block' }}>
+        ── Contents
       </Typography>
-      <List sx={{ px: 0.5 }}>
-        {toolItems.map(renderItem)}
+      <List disablePadding>
+        {items.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <ListItem key={item.path} disablePadding>
+              <ListItemButton
+                onClick={() => handleNavigation(item.path)}
+                selected={isActive}
+                aria-current={isActive ? 'page' : undefined}
+                sx={{
+                  py: 1.1,
+                  px: 2,
+                  gap: 1.5,
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                  position: 'relative',
+                  '&:hover': { bgcolor: 'action.hover', '& .nav-arrow': { opacity: 1, transform: 'translateX(0)' } },
+                  '&.Mui-selected, &.Mui-selected:hover': {
+                    bgcolor: 'text.primary',
+                    color: 'background.default',
+                  },
+                }}
+              >
+                <Typography
+                  component="span"
+                  variant="caption"
+                  sx={{
+                    fontWeight: 700,
+                    width: 26,
+                    textAlign: 'center',
+                    color: isActive ? 'accent.contrastText' : 'text.secondary',
+                    bgcolor: isActive ? 'accent.main' : 'transparent',
+                  }}
+                >
+                  {item.code}
+                </Typography>
+                <Typography component="span" sx={{ flex: 1, fontSize: '0.92rem', fontWeight: isActive ? 600 : 400 }}>
+                  {item.short}
+                </Typography>
+                <Box
+                  component="span"
+                  aria-hidden
+                  className="nav-arrow"
+                  sx={{
+                    opacity: isActive ? 1 : 0,
+                    transform: isActive ? 'none' : 'translateX(-4px)',
+                    transition: 'opacity 120ms, transform 120ms',
+                  }}
+                >
+                  →
+                </Box>
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
       </List>
+
+      <Box sx={{ mt: 'auto', p: 2, borderTop: 2, borderColor: 'text.primary' }}>
+        <Typography variant="caption" color="text.secondary" component="p" sx={{ lineHeight: 1.6 }}>
+          Everything runs in your browser.
+          <br />
+          Nothing is uploaded. Ever.
+        </Typography>
+      </Box>
     </Box>
   );
 
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const paperSx = { boxSizing: 'border-box', width: drawerWidth };
 
   return (
-    <Box
-      component="nav"
-      sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-      aria-label="navigation menu"
-    >
+    <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }} aria-label="Tools">
       <Drawer
-        container={container}
         variant="temporary"
         open={mobileOpen}
         onClose={onMobileClose}
-        ModalProps={{
-          keepMounted: true,
-        }}
-        sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-        }}
+        ModalProps={{ keepMounted: true }}
+        sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': paperSx }}
       >
         {drawer}
       </Drawer>
       <Drawer
         variant="permanent"
-        sx={{
-          display: { xs: 'none', md: 'block' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-        }}
         open
+        sx={{ display: { xs: 'none', md: 'block' }, '& .MuiDrawer-paper': paperSx }}
       >
         {drawer}
       </Drawer>

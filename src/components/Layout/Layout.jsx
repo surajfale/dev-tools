@@ -1,42 +1,45 @@
 import { useState } from 'react';
 import { Box, Toolbar } from '@mui/material';
 import Header from './Header';
-import Sidebar from './Sidebar';
+import Sidebar, { drawerWidth } from './Sidebar';
 import Footer from './Footer';
 
 export default function Layout({ children, isDarkMode, onThemeToggle }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const handleDrawerClose = () => {
-    setMobileOpen(false);
-  };
-
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      <Header 
-        onMenuClick={handleDrawerToggle}
+    <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
+      <Box
+        component="a"
+        href="#main-content"
+        sx={{
+          position: 'absolute',
+          left: -9999,
+          zIndex: 2000,
+          '&:focus': { left: 16, top: 16, p: 1, bgcolor: 'accent.main', color: 'accent.contrastText' },
+        }}
+      >
+        Skip to content
+      </Box>
+      <Header
+        onMenuClick={() => setMobileOpen((o) => !o)}
         isDarkMode={isDarkMode}
         onThemeToggle={onThemeToggle}
       />
-      <Sidebar 
-        mobileOpen={mobileOpen} 
-        onMobileClose={handleDrawerClose}
-      />
+      <Sidebar mobileOpen={mobileOpen} onMobileClose={() => setMobileOpen(false)} />
       <Box
         component="main"
+        id="main-content"
         sx={{
           flexGrow: 1,
+          minWidth: 0,
           display: 'flex',
           flexDirection: 'column',
-          width: { md: 'calc(100% - 240px)' },
+          width: { md: `calc(100% - ${drawerWidth}px)` },
         }}
       >
-        <Toolbar />
-        <Box sx={{ flexGrow: 1, p: 3 }}>
+        <Toolbar sx={{ minHeight: { xs: 56, sm: 60 } }} />
+        <Box sx={{ flexGrow: 1, px: { xs: 2, sm: 4, lg: 6 }, py: { xs: 3, sm: 5 }, maxWidth: 1440, width: '100%' }}>
           {children}
         </Box>
         <Footer />

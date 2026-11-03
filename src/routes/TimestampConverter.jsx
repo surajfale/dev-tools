@@ -19,6 +19,7 @@ import { convertTimestamp, getCurrentTimestamp } from '../lib/convertTime';
 import CopyButton from '../components/Common/CopyButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
+import PageHeader from '../components/Common/PageHeader';
 
 const sampleTimestamps = [
   '1640995200', // Unix seconds
@@ -97,13 +98,9 @@ export default function TimestampConverter() {
 
   return (
     <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Timestamp Converter
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Convert between Unix timestamps, ISO 8601, and human-readable formats. 
-        Use Ctrl/Cmd+Enter to convert quickly.
-      </Typography>
+      <PageHeader title="Timestamp Converter">
+        Convert between Unix timestamps, ISO 8601, and human-readable formats.
+      </PageHeader>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>

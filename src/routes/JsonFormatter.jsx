@@ -20,6 +20,7 @@ import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
 import CodeBlock from '../components/Common/CodeBlock';
+import PageHeader from '../components/Common/PageHeader';
 
 const sampleJson = `{
   "name": "John Doe",
@@ -89,12 +90,9 @@ export default function JsonFormatter() {
 
   return (
     <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        JSON Formatter
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Format, validate, and beautify JSON data. Use Ctrl/Cmd+Enter to format quickly.
-      </Typography>
+      <PageHeader title="JSON Formatter">
+        Format, validate, and beautify JSON data.
+      </PageHeader>
 
       <Box sx={{ mb: 3 }}>
         <Grid container spacing={2} alignItems="center">

@@ -7,7 +7,6 @@ import sql from 'react-syntax-highlighter/dist/esm/languages/prism/sql';
 import yaml from 'react-syntax-highlighter/dist/esm/languages/prism/yaml';
 import markup from 'react-syntax-highlighter/dist/esm/languages/prism/markup';
 import markdown from 'react-syntax-highlighter/dist/esm/languages/prism/markdown';
-import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 SyntaxHighlighter.registerLanguage('json', json);
 SyntaxHighlighter.registerLanguage('sql', sql);
@@ -15,7 +14,50 @@ SyntaxHighlighter.registerLanguage('yaml', yaml);
 SyntaxHighlighter.registerLanguage('markup', markup);
 SyntaxHighlighter.registerLanguage('markdown', markdown);
 
-const CODE_FONT = '"JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace';
+import { FONT_MONO as CODE_FONT } from '../../theme';
+
+/**
+ * Prism palette derived from the Workbench tokens: ink for structure,
+ * orange for keys/keywords, a muted green for strings, blue for numbers.
+ * Every token colour clears 4.5:1 against its paper background.
+ */
+function workbenchPrism(t, isDark) {
+  const c = {
+    base: t.ink,
+    comment: t.inkMuted,
+    keyword: t.accentText,
+    string: isDark ? '#9FD49A' : '#2F6B3A',
+    number: isDark ? '#8AB4FF' : '#1F4FC4',
+    punct: t.inkMuted,
+  };
+  return {
+    'code[class*="language-"]': { color: c.base, background: 'none', fontFamily: CODE_FONT },
+    'pre[class*="language-"]': { color: c.base, background: 'none' },
+    comment: { color: c.comment, fontStyle: 'italic' },
+    prolog: { color: c.comment },
+    doctype: { color: c.comment },
+    cdata: { color: c.comment },
+    punctuation: { color: c.punct },
+    property: { color: c.keyword, fontWeight: 600 },
+    'attr-name': { color: c.keyword },
+    tag: { color: c.base, fontWeight: 700 },
+    keyword: { color: c.keyword, fontWeight: 700 },
+    builtin: { color: c.keyword },
+    function: { color: c.number },
+    boolean: { color: c.number, fontWeight: 600 },
+    number: { color: c.number },
+    constant: { color: c.number },
+    null: { color: c.number },
+    string: { color: c.string },
+    'attr-value': { color: c.string },
+    char: { color: c.string },
+    url: { color: c.number, textDecoration: 'underline' },
+    operator: { color: c.base },
+    title: { color: c.keyword, fontWeight: 700 },
+    bold: { fontWeight: 700 },
+    italic: { fontStyle: 'italic' },
+  };
+}
 
 /**
  * Read-only, syntax-highlighted display for formatted/converted code output.
@@ -26,10 +68,10 @@ export default function CodeBlock({ code, language, minRows = 12, placeholder, s
   const isDark = theme.palette.mode === 'dark';
   const minHeight = `${minRows * 1.4375 + 2}em`;
 
+  const wb = theme.palette.workbench;
   const containerSx = {
-    border: '1px solid',
-    borderColor: 'divider',
-    borderRadius: 1,
+    border: 2,
+    borderColor: 'text.primary',
     overflow: 'hidden',
     minHeight,
     bgcolor: 'background.paper',
@@ -46,11 +88,14 @@ export default function CodeBlock({ code, language, minRows = 12, placeholder, s
           justifyContent: 'center',
           gap: 1,
           p: 3,
-          bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(15,23,42,0.015)',
+          borderStyle: 'dashed',
+          bgcolor: 'transparent',
+          // Diagonal hatch = "nothing here yet", a drafting-table convention.
+          backgroundImage: `repeating-linear-gradient(-45deg, transparent 0 10px, ${wb.ruleSoft} 10px 11px)`,
         }}
       >
-        <Terminal sx={{ fontSize: 28, color: 'text.disabled' }} />
-        <Typography variant="body2" color="text.secondary" align="center">
+        <Terminal aria-hidden sx={{ fontSize: 28, color: 'text.secondary' }} />
+        <Typography variant="caption" color="text.secondary" align="center" sx={{ bgcolor: 'background.default', px: 1 }}>
           {placeholder}
         </Typography>
       </Box>
@@ -61,16 +106,18 @@ export default function CodeBlock({ code, language, minRows = 12, placeholder, s
     <Box sx={containerSx}>
       <SyntaxHighlighter
         language={language}
-        style={isDark ? oneDark : oneLight}
+        style={workbenchPrism(wb, isDark)}
         showLineNumbers={showLineNumbers}
         customStyle={{
           margin: 0,
           minHeight,
           fontSize: '0.875rem',
           background: 'transparent',
+          lineHeight: 1.6,
           overflowX: 'auto',
         }}
         codeTagProps={{ style: { fontFamily: CODE_FONT } }}
+        lineNumberStyle={{ color: wb.inkMuted, minWidth: '2.5em', paddingRight: '1em', borderRight: `1px solid ${wb.ruleSoft}`, marginRight: '1em' }}
       >
         {code}
       </SyntaxHighlighter>

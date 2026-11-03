@@ -20,6 +20,7 @@ import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
 import CodeBlock from '../components/Common/CodeBlock';
+import PageHeader from '../components/Common/PageHeader';
 
 const sampleJson = `{
   "apiVersion": "v1",
@@ -133,13 +134,9 @@ export default function JsonYaml() {
 
   return (
     <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        JSON ↔ YAML Converter
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Convert between JSON and YAML formats with validation and formatting options. 
-        Use Ctrl/Cmd+Enter to convert quickly.
-      </Typography>
+      <PageHeader title="JSON ↔ YAML Converter">
+        Convert between JSON and YAML formats with validation and formatting options.
+      </PageHeader>
 
       <Box sx={{ mb: 3 }}>
         <Grid container spacing={2} alignItems="center">

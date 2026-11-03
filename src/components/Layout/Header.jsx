@@ -1,128 +1,147 @@
 import { useState, useEffect } from 'react';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Box,
-  Tooltip
-} from '@mui/material';
-import {
-  Menu as MenuIcon,
-  Brightness4,
-  Brightness7,
-  TerminalRounded
-} from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, IconButton, Box, Tooltip } from '@mui/material';
+import { Menu as MenuIcon, LightModeOutlined, DarkModeOutlined } from '@mui/icons-material';
+import { Link as RouterLink } from 'react-router-dom';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { FONT_DISPLAY } from '../../theme';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export default function Header({
-  onMenuClick,
-  isDarkMode,
-  onThemeToggle
-}) {
-  const [currentTime, setCurrentTime] = useState({
-    est: '',
-    ist: ''
-  });
+const ZONES = [
+  { label: 'UTC', tz: 'UTC' },
+  { label: 'NYC', tz: 'America/New_York' },
+  { label: 'IST', tz: 'Asia/Kolkata' },
+];
+
+function Clock({ label, value }) {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        px: 1.5,
+        alignSelf: 'stretch',
+        borderLeft: 2,
+        borderColor: 'text.primary',
+      }}
+    >
+      <Typography variant="caption" sx={{ fontWeight: 700, color: 'secondary.main' }}>
+        {label}
+      </Typography>
+      <Typography variant="caption" sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
+        {value}
+      </Typography>
+    </Box>
+  );
+}
+
+export default function Header({ onMenuClick, isDarkMode, onThemeToggle }) {
+  const [now, setNow] = useState(() => dayjs());
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = dayjs();
-      setCurrentTime({
-        est: now.tz('America/New_York').format('MMM DD, h:mm A'),
-        ist: now.tz('Asia/Kolkata').format('MMM DD, h:mm A')
-      });
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-
-    return () => clearInterval(interval);
+    const id = setInterval(() => setNow(dayjs()), 1000);
+    return () => clearInterval(id);
   }, []);
+
+  const themeLabel = `Switch to ${isDarkMode ? 'light' : 'dark'} mode`;
 
   return (
     <AppBar
       position="fixed"
       color="inherit"
-      sx={{
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        bgcolor: 'background.paper',
-      }}
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, bgcolor: 'background.default' }}
     >
-      <Toolbar>
+      <Toolbar disableGutters sx={{ minHeight: { xs: 56, sm: 60 }, alignItems: 'stretch' }}>
         <IconButton
           color="inherit"
-          aria-label="open drawer"
-          edge="start"
+          aria-label="Open navigation"
           onClick={onMenuClick}
-          sx={{ mr: 1, display: { md: 'none' } }}
+          sx={{ width: 56, borderRight: 2, borderColor: 'text.primary', display: { md: 'none' } }}
         >
           <MenuIcon />
         </IconButton>
 
+        {/* Wordmark — occupies exactly the sidebar column on desktop */}
         <Box
+          component={RouterLink}
+          to="/"
+          aria-label="Dev Tools home"
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            width: 32,
-            height: 32,
-            borderRadius: 1,
-            bgcolor: 'primary.main',
-            color: 'primary.contrastText',
-            mr: 1.5,
+            gap: 1,
+            px: 2,
+            width: { md: 248 },
+            flexShrink: 0,
+            borderRight: { md: 2 },
+            borderColor: { md: 'text.primary' },
+            color: 'text.primary',
+            textDecoration: 'none',
           }}
         >
-          <TerminalRounded fontSize="small" />
-        </Box>
-
-        <Typography
-          variant="h6"
-          noWrap
-          component="div"
-          sx={{ flexGrow: 1, fontWeight: 700 }}
-          aria-label="Developer Tools"
-        >
-          Developer Tools
-        </Typography>
-
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Box
+            aria-hidden
             sx={{
-              display: { xs: 'none', sm: 'flex' },
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              fontFamily: '"JetBrains Mono", monospace',
-              px: 1.5,
-              py: 0.5,
-              borderRadius: 1.5,
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.04)',
+              width: 14,
+              height: 14,
+              bgcolor: 'accent.main',
+              border: 2,
+              borderColor: 'text.primary',
+              flexShrink: 0,
+            }}
+          />
+          <Typography
+            component="span"
+            sx={{
+              fontFamily: FONT_DISPLAY,
+              fontWeight: 900,
+              fontStretch: '70%',
+              fontSize: '1.6rem',
+              lineHeight: 1,
+              letterSpacing: '-0.01em',
+              textTransform: 'uppercase',
             }}
           >
-            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.4, fontVariantNumeric: 'tabular-nums' }}>
-              EST {currentTime.est}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.4, fontVariantNumeric: 'tabular-nums' }}>
-              IST {currentTime.ist}
-            </Typography>
-          </Box>
-
-          <Tooltip title={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}>
-            <IconButton
-              color="inherit"
-              onClick={onThemeToggle}
-              aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
-            >
-              {isDarkMode ? <Brightness7 /> : <Brightness4 />}
-            </IconButton>
-          </Tooltip>
+            Dev
+            <Box component="span" sx={{ color: 'secondary.main' }}>/</Box>
+            Tools
+          </Typography>
         </Box>
+
+        <Box
+          sx={{
+            flex: 1,
+            display: { xs: 'none', lg: 'flex' },
+            alignItems: 'center',
+            px: 2,
+          }}
+        >
+          <Typography variant="caption" color="text.secondary" noWrap>
+            client-side only · zero uploads · no tracking
+          </Typography>
+        </Box>
+        <Box sx={{ flex: 1, display: { xs: 'block', lg: 'none' } }} />
+
+        <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'stretch' }} role="group" aria-label="World clocks">
+          {ZONES.map((z) => (
+            <Clock key={z.tz} label={z.label} value={now.tz(z.tz).format('HH:mm:ss')} />
+          ))}
+        </Box>
+
+        <Tooltip title={themeLabel}>
+          <IconButton
+            color="inherit"
+            onClick={onThemeToggle}
+            aria-label={themeLabel}
+            sx={{ width: 60, borderLeft: 2, borderColor: 'text.primary' }}
+          >
+            {isDarkMode ? <LightModeOutlined /> : <DarkModeOutlined />}
+          </IconButton>
+        </Tooltip>
       </Toolbar>
     </AppBar>
   );

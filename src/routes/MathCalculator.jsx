@@ -14,6 +14,7 @@ import { calculateSum, formatNumber } from '../lib/calculateSum';
 import CopyButton from '../components/Common/CopyButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
+import PageHeader from '../components/Common/PageHeader';
 
 const sampleNumbers = `10
 20
@@ -63,12 +64,9 @@ export default function MathCalculator() {
 
   return (
     <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Math Calculator
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Sum numbers separated by commas, spaces, or new lines. Supports decimals. Use Ctrl/Cmd+Enter to calculate quickly.
-      </Typography>
+      <PageHeader title="Math Calculator">
+        Sum numbers separated by commas, spaces, or new lines. Supports decimals.
+      </PageHeader>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
@@ -109,9 +107,9 @@ export default function MathCalculator() {
 
           {result ? (
             <Stack spacing={2}>
-              <Card elevation={3} sx={{ bgcolor: 'primary.main', color: 'white' }}>
+              <Card elevation={3} sx={{ bgcolor: 'accent.main', color: 'accent.contrastText', boxShadow: (t) => `6px 6px 0 0 ${t.palette.text.primary}` }}>
                 <CardContent>
-                  <Typography variant="subtitle2" sx={{ opacity: 0.9 }}>
+                  <Typography variant="subtitle2">
                     Sum
                   </Typography>
                   <Typography variant="h3" component="div" sx={{ fontWeight: 'bold', my: 1 }}>
@@ -123,6 +121,7 @@ export default function MathCalculator() {
                 </CardContent>
               </Card>
 
+              <Box>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
                   <Card>
@@ -177,6 +176,8 @@ export default function MathCalculator() {
                 </Grid>
               </Grid>
 
+              </Box>
+
               <Card variant="outlined">
                 <CardContent>
                   <Typography variant="subtitle2" color="text.secondary" gutterBottom>
@@ -196,8 +197,8 @@ export default function MathCalculator() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 border: '2px dashed',
-                borderColor: 'divider',
-                borderRadius: 2,
+                borderColor: 'text.primary',
+                borderRadius: 0,
                 bgcolor: 'background.paper'
               }}
             >

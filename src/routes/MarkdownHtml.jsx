@@ -20,6 +20,7 @@ import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
 import CodeBlock from '../components/Common/CodeBlock';
+import PageHeader from '../components/Common/PageHeader';
 
 const sampleMarkdown = `# Sample Markdown Document
 
@@ -151,13 +152,9 @@ export default function MarkdownHtml() {
 
   return (
     <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Markdown ↔ HTML Converter
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Convert between Markdown and HTML formats with live preview. 
-        Use Ctrl/Cmd+Enter to convert quickly.
-      </Typography>
+      <PageHeader title="Markdown ↔ HTML Converter">
+        Convert between Markdown and HTML formats with live preview.
+      </PageHeader>
 
       <Box sx={{ mb: 3 }}>
         <FormControl size="small" sx={{ minWidth: 200 }}>

@@ -77,11 +77,14 @@ src/
 │   │   ├── Header.jsx          # Top nav with theme toggle
 │   │   ├── Sidebar.jsx         # Tool navigation
 │   │   ├── Footer.jsx          # Footer with credits
+│   │   ├── toolRegistry.jsx    # Single source of truth for tool metadata
 │   │   └── Layout.jsx          # Main layout wrapper
 │   └── Common/                 # Reusable utility components
 │       ├── CopyButton.jsx      # Clipboard functionality
 │       ├── DownloadButton.jsx  # File download
 │       ├── ErrorAlert.jsx      # Error display
+│       ├── PageHeader.jsx      # Spec-sheet tool header (T/0n, title, kbd hint)
+│       ├── CodeBlock.jsx       # Syntax-highlighted output with theme-derived Prism palette
 │       └── SampleInputButton.jsx # Load sample data
 └── lib/                        # Business logic utilities
     ├── formatJson.js           # JSON formatting/minifying
@@ -120,6 +123,14 @@ Each tool follows this pattern:
 - Pure functions that accept input and options, return formatted output
 - Consistent error throwing for component error boundaries
 
+### Visual Design System ("Workbench Spec Sheet")
+- Brutalist/editorial look defined entirely in `src/theme.js`: warm paper + ink, one signal-orange accent, 0px radii, 2px rules, hard offset shadows (no blurred elevation), graph-paper body grid
+- Fonts (loaded in `index.html`): Archivo variable (display, condensed via `fontStretch`), IBM Plex Sans (body), JetBrains Mono (labels, buttons, code) — exported as `FONT_DISPLAY` / `FONT_BODY` / `FONT_MONO`
+- Palette: `primary` = ink, `secondary` = orange safe for text, `accent` = bright orange for FILLS ONLY (always with ink text), raw tokens on `theme.palette.workbench`
+- Tool metadata (number, tag, title, description, icon) lives in `src/components/Layout/toolRegistry.jsx` — consumed by Sidebar, Dashboard and `PageHeader`
+- Every tool page starts with `<PageHeader title="…">description</PageHeader>` (`src/components/Common/PageHeader.jsx`)
+- Don't hardcode colors/radii/shadows in components; check new color pairs for WCAG AA in both modes
+
 ### Material UI Integration
 - Custom theme with light/dark mode support (`src/theme.js`)
 - Responsive breakpoints for mobile/desktop layouts
@@ -151,7 +162,7 @@ Each tool follows this pattern:
 1. Create utility function in `src/lib/` following existing patterns
 2. Create route component in `src/routes/` with consistent UI structure
 3. Add route to `src/App.jsx` router configuration
-4. Update sidebar navigation in `src/components/Layout/Sidebar.jsx`
+4. Register the tool in `src/components/Layout/toolRegistry.jsx` (drives sidebar, dashboard grid, and page header numbering)
 5. Follow existing patterns for options, error handling, and actions
 
 #### Utility Function Pattern (src/lib/)
