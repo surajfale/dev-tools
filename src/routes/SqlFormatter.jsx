@@ -20,6 +20,7 @@ import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
 import CodeBlock from '../components/Common/CodeBlock';
+import PageHeader from '../components/Common/PageHeader';
 
 const sampleSql = `SELECT u.id, u.name, u.email, p.title as post_title, p.created_at FROM users u LEFT JOIN posts p ON u.id = p.user_id WHERE u.active = 1 AND p.published = true ORDER BY p.created_at DESC LIMIT 10;`;
 
@@ -68,12 +69,9 @@ export default function SqlFormatter() {
 
   return (
     <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        SQL Formatter
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Format and beautify SQL queries with support for multiple dialects. Use Ctrl/Cmd+Enter to format quickly.
-      </Typography>
+      <PageHeader title="SQL Formatter">
+        Format and beautify SQL queries with support for multiple dialects.
+      </PageHeader>
 
       <Box sx={{ mb: 3 }}>
         <Grid container spacing={2} alignItems="center">

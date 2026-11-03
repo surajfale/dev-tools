@@ -1,10 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#000"/>
-  <g fill="#fff" transform="translate(96,128)">
-    <rect x="0" y="64" width="320" height="40" rx="20"/>
-    <rect x="0" y="152" width="256" height="40" rx="20"/>
-    <rect x="0" y="240" width="192" height="40" rx="20"/>
-  </g>
+  <!-- Monochrome (Android themed icons): only alpha matters. Same geometry as the maskable mark. -->
+  <circle cx="256" cy="256" r="168" fill="none" stroke="#FFF" stroke-width="10"/>
+  <polygon points="196,388 252,388 316,124 260,124" fill="#FFF"/>
+  <circle cx="137" cy="137" r="28" fill="#FFF"/>
+  <circle cx="332" cy="332" r="14" fill="#FFF"/>
 </svg>
-
-

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Favicon: only the two shapes that survive 16px — a heavy slash and the orbit body.
+       The ring from the app icon turns to grey fuzz below 32px, so it is left out here. -->
+  <rect width="32" height="32" fill="#0A0E12"/>
+  <polygon points="9,27 15,27 23,5 17,5" fill="#FFB020"/>
+  <circle cx="7.5" cy="9" r="3.5" fill="#FFB020"/>
+</svg>

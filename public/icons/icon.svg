@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Dev/Tools · Mission Control mark ("any" purpose: full square, bracket corners) -->
+  <rect width="512" height="512" fill="#0A0E12"/>
+  <g stroke="#DAE3EB" stroke-opacity="0.05" stroke-width="2">
+    <path d="M64 0V512M128 0V512M192 0V512M256 0V512M320 0V512M384 0V512M448 0V512"/>
+    <path d="M0 64H512M0 128H512M0 192H512M0 256H512M0 320H512M0 384H512M0 448H512"/>
+  </g>
+  <circle cx="256" cy="256" r="168" fill="none" stroke="#DAE3EB" stroke-opacity="0.3" stroke-width="6"/>
+  <circle cx="256" cy="256" r="108" fill="none" stroke="#DAE3EB" stroke-opacity="0.2" stroke-width="4" stroke-dasharray="10 12"/>
+  <polygon points="196,388 252,388 316,124 260,124" fill="#FFB020"/>
+  <circle cx="137" cy="137" r="24" fill="#FFB020"/>
+  <circle cx="137" cy="137" r="40" fill="none" stroke="#FFB020" stroke-opacity="0.25" stroke-width="6"/>
+  <circle cx="332" cy="332" r="12" fill="#7BD88F"/>
+  <g fill="none" stroke="#FFB020" stroke-width="12" stroke-linecap="square">
+    <path d="M40 112V40H112"/>
+    <path d="M472 400V472H400"/>
+  </g>
+</svg>

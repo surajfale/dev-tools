@@ -1,176 +1,199 @@
-import {
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  Box
-} from '@mui/material';
-import {
-  Code,
-  Storage,
-  Schedule,
-  Article,
-  SwapHoriz,
-  Visibility,
-  Calculate,
-  ArrowForward
-} from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Typography, Box } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { tools } from '../components/Layout/toolRegistry';
+import OrbitRings from '../components/Common/OrbitRings';
+import { bracketBackground } from '../theme';
+import { prefersReducedMotion } from '../lib/typewriter';
 
-const tools = [
-  {
-    title: 'JSON Formatter',
-    description: 'Format, validate, and minify JSON data with customizable indentation and key sorting.',
-    icon: <Code />,
-    path: '/json-formatter',
-    color: 'primary'
-  },
-  {
-    title: 'SQL Formatter',
-    description: 'Format SQL queries with support for multiple dialects and customizable styling options.',
-    icon: <Storage />,
-    path: '/sql-formatter',
-    color: 'secondary'
-  },
-  {
-    title: 'Timestamp Converter',
-    description: 'Convert between Unix timestamps, ISO 8601, and human-readable date formats.',
-    icon: <Schedule />,
-    path: '/timestamp-converter',
-    color: 'success'
-  },
-  {
-    title: 'Markdown ↔ HTML',
-    description: 'Convert between Markdown and HTML with live preview and safe HTML sanitization.',
-    icon: <Article />,
-    path: '/markdown-html',
-    color: 'info'
-  },
-  {
-    title: 'JSON ↔ YAML',
-    description: 'Bidirectional conversion between JSON and YAML formats with validation.',
-    icon: <SwapHoriz />,
-    path: '/json-yaml',
-    color: 'warning'
-  },
-  {
-    title: 'HTML Preview',
-    description: 'Preview HTML with live rendering. Upload to cloud for permanent shareable links (any file size).',
-    icon: <Visibility />,
-    path: '/html-preview',
-    color: 'error'
-  },
-  {
-    title: 'Math Calculator',
-    description: 'Sum numbers separated by commas, spaces, or new lines. Shows sum, average, min, max, and count.',
-    icon: <Calculate />,
-    path: '/math-calculator',
-    color: 'success'
-  }
+const facts = [
+  { k: 'Tools', v: tools.length },
+  { k: 'Servers', v: 0 },
+  { k: 'Uploads', v: 0 },
+  { k: 'Trackers', v: 0 },
 ];
 
-export default function Dashboard() {
-  const navigate = useNavigate();
+const pad = (n) => String(n).padStart(2, '0');
 
-  return (
-    <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Developer Tools
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        {tools.length} essential utilities to format, convert, and inspect data — all in the browser, nothing leaves your machine.
-      </Typography>
+/** Instrument-style readout: digits scramble briefly, then settle on the value. */
+function Readout({ value }) {
+  const [display, setDisplay] = useState(() => (prefersReducedMotion() ? value : 0));
 
-      <Grid container spacing={3} sx={{ mt: 0.5 }}>
-        {tools.map((tool) => (
-          <Grid item xs={12} sm={6} md={4} key={tool.path}>
-            <Card
-              sx={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-                outlineOffset: 2,
-                '&:focus-visible': {
-                  outline: (theme) => `2px solid ${theme.palette.primary.main}`,
-                },
-                '&:hover': {
-                  borderColor: `${tool.color}.main`,
-                  boxShadow: (theme) =>
-                    theme.palette.mode === 'dark'
-                      ? '0 8px 24px rgba(0,0,0,0.4)'
-                      : '0 8px 24px rgba(15,23,42,0.1)',
-                  '@media (prefers-reduced-motion: no-preference)': {
-                    transform: 'translateY(-3px)',
-                  },
-                  '& .tool-cta': {
-                    color: `${tool.color}.main`,
-                    transform: 'translateX(2px)',
-                  },
-                },
-              }}
-              onClick={() => navigate(tool.path)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  navigate(tool.path);
-                }
-              }}
-              aria-label={`Open ${tool.title}`}
-            >
-              <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 44,
-                    height: 44,
-                    borderRadius: 1.5,
-                    mb: 2,
-                    bgcolor: (theme) => alphaBg(theme, tool.color),
-                    color: `${tool.color}.main`,
-                  }}
-                >
-                  {tool.icon}
-                </Box>
-                <Typography variant="h6" component="h2" gutterBottom>
-                  {tool.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
-                  {tool.description}
-                </Typography>
-                <Box
-                  className="tool-cta"
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    mt: 2,
-                    color: 'text.secondary',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    transition: 'transform 180ms ease, color 180ms ease',
-                  }}
-                >
-                  Open tool
-                  <ArrowForward sx={{ fontSize: 16 }} />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  );
+  useEffect(() => {
+    if (prefersReducedMotion()) {
+      setDisplay(value);
+      return undefined;
+    }
+    let step = 0;
+    const id = setInterval(() => {
+      step += 1;
+      if (step >= 14) {
+        clearInterval(id);
+        setDisplay(value);
+      } else {
+        setDisplay(Math.floor(Math.random() * 99));
+      }
+    }, 45);
+    return () => clearInterval(id);
+  }, [value]);
+
+  return <>{pad(display)}</>;
 }
 
-function alphaBg(theme, color) {
-  const channel = theme.palette[color]?.main;
-  if (!channel) return theme.palette.action.hover;
-  return theme.palette.mode === 'dark'
-    ? `${channel}26`
-    : `${channel}1A`;
+export default function Dashboard() {
+  return (
+    <Box>
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1fr) auto' },
+          gap: 4,
+          alignItems: 'center',
+          mb: { xs: 5, md: 7 },
+        }}
+      >
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="overline" color="text.secondary" component="p" sx={{ mb: 2 }}>
+            Console / Vol. 02 — tools for the unglamorous parts of the job
+          </Typography>
+
+          <Typography variant="h1" sx={{ fontSize: { xs: '3.2rem', sm: '5rem', xl: '6.5rem' }, mb: 3 }}>
+            Format. Convert.
+            <br />
+            <Box component="span" sx={{ color: 'secondary.main' }}>
+              All systems nominal.
+            </Box>
+          </Typography>
+
+          <Typography variant="body1" sx={{ fontSize: '1.05rem', maxWidth: '58ch', color: 'text.secondary', mb: 3 }}>
+            Paste the payload, get back something you would put in a PR. Every tool runs in your browser, so nothing
+            leaves this machine.
+          </Typography>
+
+          <Box
+            component="dl"
+            aria-label="System readout"
+            sx={{
+              display: 'inline-grid',
+              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, auto)' },
+              gap: '1px',
+              m: 0,
+              border: 1,
+              borderColor: 'tokens.rule',
+              bgcolor: 'tokens.rule',
+            }}
+          >
+            {facts.map((f) => (
+              <Box key={f.k} sx={{ px: 2, py: 1, bgcolor: 'background.paper', minWidth: 96 }}>
+                <Typography component="dt" variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem', letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+                  {f.k}
+                </Typography>
+                <Typography component="dd" variant="h5" sx={{ m: 0, fontSize: '1.6rem', lineHeight: 1.15 }}>
+                  <Readout value={f.v} />
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
+        <OrbitRings size={280} sx={{ display: { xs: 'none', lg: 'block' }, mr: 2 }} />
+      </Box>
+
+      {/* ── Instruments ──────────────────────────────────────── */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <Typography variant="h6" component="h2">
+          Instruments
+        </Typography>
+        <Box aria-hidden sx={{ flex: 1, borderTop: 1, borderColor: 'tokens.rule' }} />
+        <Typography variant="caption" color="text.secondary">
+          {pad(tools.length)} ENTRIES
+        </Typography>
+      </Box>
+
+      <Box
+        component="ul"
+        sx={{
+          listStyle: 'none',
+          p: 0,
+          m: 0,
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
+          gap: 1.5,
+        }}
+      >
+        {tools.map(({ code, tag, title, description, path, Icon }, idx) => (
+          <Box
+            component="li"
+            key={path}
+            sx={{
+              // Feature tiles span two columns so 7 entries tile with no gaps:
+              // sm (2 cols): 2+1·6 = 8 cells; lg (3 cols): 2+1·5+2 = 9 cells.
+              gridColumn: {
+                sm: idx === 0 ? 'span 2' : 'auto',
+                lg: idx === 0 || idx === tools.length - 1 ? 'span 2' : 'auto',
+              },
+            }}
+          >
+            <Box
+              component={RouterLink}
+              to={path}
+              aria-label={`Open ${title}`}
+              sx={(theme) => {
+                const t = theme.palette.tokens;
+                return {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%',
+                  minHeight: { xs: 180, md: 210 },
+                  p: { xs: 2.5, md: 3 },
+                  color: 'text.primary',
+                  textDecoration: 'none',
+                  border: 1,
+                  borderColor: 'divider',
+                  background: bracketBackground(t.accentText, t.paper, 10),
+                  transition: 'border-color 150ms, background 150ms',
+                  '&:hover, &:focus-visible': {
+                    borderColor: t.accentText,
+                    background: bracketBackground(t.accentText, t.paper, 22),
+                    '& .tile-code::before': { content: '"▸ "' },
+                    '& .tile-go': { transform: 'translateX(4px)', color: 'secondary.main' },
+                  },
+                };
+              }}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 'auto' }}>
+                <Typography className="tile-code" variant="caption" sx={{ color: 'secondary.main', letterSpacing: '0.08em' }}>
+                  T/{code} · {tag}
+                </Typography>
+                <Icon aria-hidden sx={{ fontSize: 20, color: 'text.secondary' }} />
+              </Box>
+
+              <Typography
+                variant="h3"
+                component="h3"
+                sx={{ mt: 4, mb: 1, fontSize: { xs: '1.9rem', md: idx === 0 ? '2.8rem' : '2.1rem' }, textTransform: 'uppercase', lineHeight: 0.95 }}
+              >
+                {title}
+              </Typography>
+
+              <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 2 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
+                  {description}
+                </Typography>
+                <Typography
+                  className="tile-go"
+                  aria-hidden
+                  variant="caption"
+                  sx={{ color: 'text.secondary', transition: 'transform 150ms, color 150ms', whiteSpace: 'nowrap' }}
+                >
+                  OPEN →
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
 }

@@ -20,6 +20,7 @@ import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
 import SampleInputButton from '../components/Common/SampleInputButton';
 import CodeBlock from '../components/Common/CodeBlock';
+import PageHeader from '../components/Common/PageHeader';
 
 const sampleHtml = `<!DOCTYPE html>
 <html>
@@ -188,12 +189,9 @@ export default function HtmlPreview() {
 
   return (
     <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        HTML Preview
-      </Typography>
-      <Typography variant="body1" color="text.secondary" paragraph>
-        Paste HTML code and see it rendered live. Shareable links encode the (minified) HTML directly in the URL — nothing is ever uploaded anywhere. Use Ctrl/Cmd+Enter to preview quickly.
-      </Typography>
+      <PageHeader title="HTML Preview">
+        Paste HTML code and see it rendered live. Shareable links encode the (minified) HTML directly in the URL — nothing is ever uploaded anywhere.
+      </PageHeader>
 
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
@@ -244,10 +242,10 @@ export default function HtmlPreview() {
           {activeTab === 0 && (
             <Box>
               <Paper
-                elevation={1}
+                elevation={0}
                 sx={{
                   minHeight: 400,
-                  border: '1px solid',
+                  border: 1,
                   borderColor: 'divider',
                   overflow: 'hidden'
                 }}
