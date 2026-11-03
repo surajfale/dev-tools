@@ -88,6 +88,7 @@ src/
 │       ├── PageHeader.jsx      # Spec-sheet tool header (T/0n, title, kbd hint)
 │       ├── CodeBlock.jsx       # Syntax-highlighted output with typing reveal
 │       ├── OrbitRings.jsx      # Decorative orbit diagram (dashboard hero)
+│       ├── OutputPopout.jsx    # Full-screen output view + PopoutButton (JSON, SQL)
 │       ├── SettingsProvider.jsx # User settings state + localStorage sync
 │       ├── settingsContext.js  # SettingsContext + useSettings() hook
 │       └── SampleInputButton.jsx # Load sample data
@@ -188,6 +189,12 @@ All utility functions follow a consistent return pattern:
 // Error case
 { success: false, error: "Error message", line: "optional position info" }
 ```
+
+#### Formatter Output & Full-screen Popout (JSON, SQL)
+- Store the **source** input of the last successful run (`source` state) and **derive** the output with `useMemo` from source + options. Option toggles then re-apply instantly, and reversible options stay correct (turning Sort Keys off restores original key order — you can't recover it from sorted output)
+- Render the tool's options as one local component (`JsonOptions`, `SqlOptions`) used both on the page and in `OutputPopout`'s `toolbar` against the same state, so the two views can't drift. Give each instance a distinct `idPrefix` (both are mounted while the popout is open)
+- `OutputPopout` owns no formatting state; pass it `code`, `language`, `filename`, `toolbar`, and `error` (an option change made inside it can fail, e.g. a SQL dialect switch)
+- Its `CodeBlock` uses `fill` and `animate={false}`: toggles are view changes, so they never replay the typing reveal
 
 #### Common Component Props
 - All tools accept `input` and options via controlled components
