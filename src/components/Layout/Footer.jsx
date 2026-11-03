@@ -10,9 +10,9 @@ export default function Footer() {
       sx={{
         mt: 'auto',
         px: { xs: 2, sm: 4, lg: 6 },
-        py: 2,
-        borderTop: 2,
-        borderColor: 'text.primary',
+        py: 1.75,
+        borderTop: 1,
+        borderColor: 'tokens.rule',
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
@@ -21,10 +21,13 @@ export default function Footer() {
       }}
     >
       <Typography variant="caption" color="text.secondary">
-        © {year} DEV/TOOLS — built by <Box component="b" sx={{ color: 'text.primary' }}>Suraj</Box>
+        © {year} DEV/TOOLS · built by{' '}
+        <Box component="b" sx={{ color: 'text.primary', fontWeight: 500 }}>
+          Suraj
+        </Box>
       </Typography>
       <Typography variant="caption" color="text.secondary">
-        REACT · MUI · VITE — NO SERVERS WERE HARMED
+        REACT · MUI · VITE · 0 UPLINKS
       </Typography>
     </Box>
   );

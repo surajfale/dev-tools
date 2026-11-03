@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
 import { Terminal } from '@mui/icons-material';
@@ -7,6 +8,8 @@ import sql from 'react-syntax-highlighter/dist/esm/languages/prism/sql';
 import yaml from 'react-syntax-highlighter/dist/esm/languages/prism/yaml';
 import markup from 'react-syntax-highlighter/dist/esm/languages/prism/markup';
 import markdown from 'react-syntax-highlighter/dist/esm/languages/prism/markdown';
+import { FONT_MONO as CODE_FONT, bracketBackground } from '../../theme';
+import { planReveal, prefersReducedMotion } from '../../lib/typewriter';
 
 SyntaxHighlighter.registerLanguage('json', json);
 SyntaxHighlighter.registerLanguage('sql', sql);
@@ -14,22 +17,15 @@ SyntaxHighlighter.registerLanguage('yaml', yaml);
 SyntaxHighlighter.registerLanguage('markup', markup);
 SyntaxHighlighter.registerLanguage('markdown', markdown);
 
-import { FONT_MONO as CODE_FONT } from '../../theme';
+const CARET = '▌';
 
 /**
- * Prism palette derived from the Workbench tokens: ink for structure,
- * orange for keys/keywords, a muted green for strings, blue for numbers.
- * Every token colour clears 4.5:1 against its paper background.
+ * Prism palette derived from the Mission Control tokens: amber for
+ * keys/keywords, green for strings, blue for numbers and literals.
+ * Every token colour clears 4.5:1 against the panel surface.
  */
-function workbenchPrism(t, isDark) {
-  const c = {
-    base: t.ink,
-    comment: t.inkMuted,
-    keyword: t.accentText,
-    string: isDark ? '#9FD49A' : '#2F6B3A',
-    number: isDark ? '#8AB4FF' : '#1F4FC4',
-    punct: t.inkMuted,
-  };
+function missionPrism(t) {
+  const c = { base: t.ink, comment: t.inkMuted, keyword: t.accentText, string: t.codeString, number: t.codeNumber, punct: t.inkMuted };
   return {
     'code[class*="language-"]': { color: c.base, background: 'none', fontFamily: CODE_FONT },
     'pre[class*="language-"]': { color: c.base, background: 'none' },
@@ -38,13 +34,13 @@ function workbenchPrism(t, isDark) {
     doctype: { color: c.comment },
     cdata: { color: c.comment },
     punctuation: { color: c.punct },
-    property: { color: c.keyword, fontWeight: 600 },
+    property: { color: c.keyword },
     'attr-name': { color: c.keyword },
-    tag: { color: c.base, fontWeight: 700 },
-    keyword: { color: c.keyword, fontWeight: 700 },
+    tag: { color: c.base, fontWeight: 600 },
+    keyword: { color: c.keyword, fontWeight: 600 },
     builtin: { color: c.keyword },
     function: { color: c.number },
-    boolean: { color: c.number, fontWeight: 600 },
+    boolean: { color: c.number },
     number: { color: c.number },
     constant: { color: c.number },
     null: { color: c.number },
@@ -53,28 +49,65 @@ function workbenchPrism(t, isDark) {
     char: { color: c.string },
     url: { color: c.number, textDecoration: 'underline' },
     operator: { color: c.base },
-    title: { color: c.keyword, fontWeight: 700 },
+    title: { color: c.keyword, fontWeight: 600 },
     bold: { fontWeight: 700 },
     italic: { fontStyle: 'italic' },
   };
 }
 
 /**
+ * Reveals new output line by line, like a terminal printing it. The first
+ * value shown on mount is not animated, outputs over the cap appear at once
+ * (see planReveal), and reduced-motion users always get the result instantly.
+ */
+function useTypingReveal(code) {
+  const [shown, setShown] = useState(code);
+  const previous = useRef(code);
+
+  useEffect(() => {
+    const changed = code !== previous.current;
+    previous.current = code;
+    const lines = code ? code.split('\n') : [];
+    const plan = changed && code && !prefersReducedMotion() ? planReveal(lines.length) : null;
+
+    if (!plan) {
+      setShown(code);
+      return undefined;
+    }
+
+    let count = 0;
+    setShown('');
+    const id = setInterval(() => {
+      count += plan.linesPerTick;
+      if (count >= lines.length) {
+        clearInterval(id);
+        setShown(code);
+      } else {
+        setShown(lines.slice(0, count).join('\n'));
+      }
+    }, plan.interval);
+    return () => clearInterval(id);
+  }, [code]);
+
+  return { shown, typing: Boolean(code) && shown !== code };
+}
+
+/**
  * Read-only, syntax-highlighted display for formatted/converted code output.
- * Mirrors the outlined TextField it replaces so layouts don't shift.
+ * Mirrors the outlined TextField it sits next to so layouts don't shift.
  */
 export default function CodeBlock({ code, language, minRows = 12, placeholder, showLineNumbers = true }) {
   const theme = useTheme();
-  const isDark = theme.palette.mode === 'dark';
+  const t = theme.palette.tokens;
   const minHeight = `${minRows * 1.4375 + 2}em`;
+  const { shown, typing } = useTypingReveal(code);
 
-  const wb = theme.palette.workbench;
   const containerSx = {
-    border: 2,
-    borderColor: 'text.primary',
+    border: 1,
+    borderColor: 'divider',
     overflow: 'hidden',
     minHeight,
-    bgcolor: 'background.paper',
+    background: bracketBackground(t.accentText, t.paper),
   };
 
   if (!code) {
@@ -89,24 +122,28 @@ export default function CodeBlock({ code, language, minRows = 12, placeholder, s
           gap: 1,
           p: 3,
           borderStyle: 'dashed',
-          bgcolor: 'transparent',
-          // Diagonal hatch = "nothing here yet", a drafting-table convention.
-          backgroundImage: `repeating-linear-gradient(-45deg, transparent 0 10px, ${wb.ruleSoft} 10px 11px)`,
+          background: 'transparent',
         }}
       >
-        <Terminal aria-hidden sx={{ fontSize: 28, color: 'text.secondary' }} />
-        <Typography variant="caption" color="text.secondary" align="center" sx={{ bgcolor: 'background.default', px: 1 }}>
+        <Terminal aria-hidden sx={{ fontSize: 26, color: 'text.secondary' }} />
+        <Typography variant="caption" color="text.secondary" align="center">
           {placeholder}
+        </Typography>
+        <Typography variant="caption" sx={{ color: 'secondary.main', fontSize: '0.7rem', letterSpacing: '0.12em' }}>
+          AWAITING INPUT
+          <Box component="span" aria-hidden sx={{ animation: 'mc-blink 1s steps(1) infinite', ml: 0.5 }}>
+            {CARET}
+          </Box>
         </Typography>
       </Box>
     );
   }
 
   return (
-    <Box sx={containerSx}>
+    <Box sx={containerSx} aria-busy={typing}>
       <SyntaxHighlighter
         language={language}
-        style={workbenchPrism(wb, isDark)}
+        style={missionPrism(t)}
         showLineNumbers={showLineNumbers}
         customStyle={{
           margin: 0,
@@ -117,9 +154,15 @@ export default function CodeBlock({ code, language, minRows = 12, placeholder, s
           overflowX: 'auto',
         }}
         codeTagProps={{ style: { fontFamily: CODE_FONT } }}
-        lineNumberStyle={{ color: wb.inkMuted, minWidth: '2.5em', paddingRight: '1em', borderRight: `1px solid ${wb.ruleSoft}`, marginRight: '1em' }}
+        lineNumberStyle={{
+          color: t.inkMuted,
+          minWidth: '2.5em',
+          paddingRight: '1em',
+          borderRight: `1px solid ${t.ruleSoft}`,
+          marginRight: '1em',
+        }}
       >
-        {code}
+        {typing ? `${shown}${shown ? ' ' : ''}${CARET}` : shown}
       </SyntaxHighlighter>
     </Box>
   );

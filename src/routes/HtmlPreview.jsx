@@ -232,7 +232,7 @@ export default function HtmlPreview() {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Box sx={{ borderBottom: 2, borderColor: 'text.primary', mb: 2 }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
             <Tabs value={activeTab} onChange={(e, val) => setActiveTab(val)}>
               <Tab label="Preview" icon={<Visibility />} iconPosition="start" />
               <Tab label="Sanitized HTML" icon={<CodeIcon />} iconPosition="start" />
@@ -245,8 +245,8 @@ export default function HtmlPreview() {
                 elevation={0}
                 sx={{
                   minHeight: 400,
-                  border: 2,
-                  borderColor: 'text.primary',
+                  border: 1,
+                  borderColor: 'divider',
                   overflow: 'hidden'
                 }}
               >

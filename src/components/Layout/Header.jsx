@@ -5,7 +5,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import { FONT_DISPLAY } from '../../theme';
+import { drawerWidth } from './Sidebar';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -16,23 +16,15 @@ const ZONES = [
   { label: 'IST', tz: 'Asia/Kolkata' },
 ];
 
+const cell = { borderLeft: 1, borderColor: 'tokens.rule' };
+
 function Clock({ label, value }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1,
-        px: 1.5,
-        alignSelf: 'stretch',
-        borderLeft: 2,
-        borderColor: 'text.primary',
-      }}
-    >
-      <Typography variant="caption" sx={{ fontWeight: 700, color: 'secondary.main' }}>
+    <Box sx={{ ...cell, display: 'flex', alignItems: 'center', gap: 1, px: 1.75 }}>
+      <Typography variant="caption" sx={{ fontWeight: 500, color: 'secondary.main' }}>
         {label}
       </Typography>
-      <Typography variant="caption" sx={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
+      <Typography variant="caption" sx={{ fontVariantNumeric: 'tabular-nums' }}>
         {value}
       </Typography>
     </Box>
@@ -55,12 +47,12 @@ export default function Header({ onMenuClick, isDarkMode, onThemeToggle }) {
       color="inherit"
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, bgcolor: 'background.default' }}
     >
-      <Toolbar disableGutters sx={{ minHeight: { xs: 56, sm: 60 }, alignItems: 'stretch' }}>
+      <Toolbar disableGutters sx={{ minHeight: { xs: 52, sm: 56 }, alignItems: 'stretch' }}>
         <IconButton
           color="inherit"
           aria-label="Open navigation"
           onClick={onMenuClick}
-          sx={{ width: 56, borderRight: 2, borderColor: 'text.primary', display: { md: 'none' } }}
+          sx={{ width: 52, borderRight: 1, borderColor: 'tokens.rule', display: { md: 'none' } }}
         >
           <MenuIcon />
         </IconButton>
@@ -73,41 +65,20 @@ export default function Header({ onMenuClick, isDarkMode, onThemeToggle }) {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1,
+            gap: 1.25,
             px: 2,
-            width: { md: 248 },
+            width: { md: drawerWidth },
             flexShrink: 0,
-            borderRight: { md: 2 },
-            borderColor: { md: 'text.primary' },
+            borderRight: { md: 1 },
+            borderColor: { md: 'tokens.rule' },
             color: 'text.primary',
             textDecoration: 'none',
           }}
         >
-          <Box
-            aria-hidden
-            sx={{
-              width: 14,
-              height: 14,
-              bgcolor: 'accent.main',
-              border: 2,
-              borderColor: 'text.primary',
-              flexShrink: 0,
-            }}
-          />
-          <Typography
-            component="span"
-            sx={{
-              fontFamily: FONT_DISPLAY,
-              fontWeight: 900,
-              fontStretch: '70%',
-              fontSize: '1.6rem',
-              lineHeight: 1,
-              letterSpacing: '-0.01em',
-              textTransform: 'uppercase',
-            }}
-          >
+          <Box aria-hidden sx={{ width: 10, height: 10, bgcolor: 'accent.main', flexShrink: 0 }} />
+          <Typography component="span" variant="h3" sx={{ fontSize: '1.45rem', lineHeight: 1, textTransform: 'uppercase' }}>
             Dev
-            <Box component="span" sx={{ color: 'secondary.main' }}>/</Box>
+            <Box component="span" sx={{ color: 'secondary.main', mx: 0.25 }}>/</Box>
             Tools
           </Typography>
         </Box>
@@ -115,31 +86,29 @@ export default function Header({ onMenuClick, isDarkMode, onThemeToggle }) {
         <Box
           sx={{
             flex: 1,
+            minWidth: 0,
             display: { xs: 'none', lg: 'flex' },
             alignItems: 'center',
+            gap: 1,
             px: 2,
           }}
         >
+          <Box aria-hidden sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: 'success.main', flexShrink: 0 }} />
           <Typography variant="caption" color="text.secondary" noWrap>
-            client-side only · zero uploads · no tracking
+            SYS.NOMINAL · client-side only · 0 uplinks
           </Typography>
         </Box>
         <Box sx={{ flex: 1, display: { xs: 'block', lg: 'none' } }} />
 
-        <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'stretch' }} role="group" aria-label="World clocks">
+        <Box role="group" aria-label="World clocks" sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'stretch' }}>
           {ZONES.map((z) => (
             <Clock key={z.tz} label={z.label} value={now.tz(z.tz).format('HH:mm:ss')} />
           ))}
         </Box>
 
         <Tooltip title={themeLabel}>
-          <IconButton
-            color="inherit"
-            onClick={onThemeToggle}
-            aria-label={themeLabel}
-            sx={{ width: 60, borderLeft: 2, borderColor: 'text.primary' }}
-          >
-            {isDarkMode ? <LightModeOutlined /> : <DarkModeOutlined />}
+          <IconButton color="inherit" onClick={onThemeToggle} aria-label={themeLabel} sx={{ ...cell, width: 56 }}>
+            {isDarkMode ? <LightModeOutlined fontSize="small" /> : <DarkModeOutlined fontSize="small" />}
           </IconButton>
         </Tooltip>
       </Toolbar>

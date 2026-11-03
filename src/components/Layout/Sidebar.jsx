@@ -2,7 +2,7 @@ import { Drawer, List, ListItem, ListItemButton, Toolbar, Box, Typography } from
 import { useNavigate, useLocation } from 'react-router-dom';
 import { tools } from './toolRegistry';
 
-export const drawerWidth = 248;
+export const drawerWidth = 232;
 
 const items = [{ code: '00', short: 'Index', path: '/' }, ...tools];
 
@@ -17,9 +17,9 @@ export default function Sidebar({ mobileOpen, onMobileClose }) {
 
   const drawer = (
     <Box role="navigation" aria-label="Main navigation" sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Toolbar sx={{ minHeight: { xs: 56, sm: 60 } }} />
+      <Toolbar sx={{ minHeight: { xs: 52, sm: 56 } }} />
       <Typography variant="overline" color="text.secondary" sx={{ px: 2, pt: 2.5, pb: 1, display: 'block' }}>
-        ── Contents
+        Contents
       </Typography>
       <List disablePadding>
         {items.map((item) => {
@@ -31,58 +31,45 @@ export default function Sidebar({ mobileOpen, onMobileClose }) {
                 selected={isActive}
                 aria-current={isActive ? 'page' : undefined}
                 sx={{
-                  py: 1.1,
+                  py: 1,
                   px: 2,
                   gap: 1.5,
                   borderBottom: 1,
                   borderColor: 'divider',
-                  position: 'relative',
-                  '&:hover': { bgcolor: 'action.hover', '& .nav-arrow': { opacity: 1, transform: 'translateX(0)' } },
+                  '&:hover': { bgcolor: 'action.hover', '& .nav-code::before': { content: '"▸"' } },
                   '&.Mui-selected, &.Mui-selected:hover': {
-                    bgcolor: 'text.primary',
-                    color: 'background.default',
+                    bgcolor: 'accent.main',
+                    color: 'accent.contrastText',
                   },
                 }}
               >
                 <Typography
+                  className="nav-code"
                   component="span"
                   variant="caption"
                   sx={{
-                    fontWeight: 700,
-                    width: 26,
-                    textAlign: 'center',
-                    color: isActive ? 'accent.contrastText' : 'text.secondary',
-                    bgcolor: isActive ? 'accent.main' : 'transparent',
+                    width: 22,
+                    color: isActive ? 'inherit' : 'text.secondary',
+                    position: 'relative',
+                    '&::before': { position: 'absolute', left: -12 },
                   }}
                 >
                   {item.code}
                 </Typography>
-                <Typography component="span" sx={{ flex: 1, fontSize: '0.92rem', fontWeight: isActive ? 600 : 400 }}>
+                <Typography component="span" sx={{ flex: 1, fontSize: '0.88rem', fontWeight: isActive ? 600 : 400 }}>
                   {item.short}
                 </Typography>
-                <Box
-                  component="span"
-                  aria-hidden
-                  className="nav-arrow"
-                  sx={{
-                    opacity: isActive ? 1 : 0,
-                    transform: isActive ? 'none' : 'translateX(-4px)',
-                    transition: 'opacity 120ms, transform 120ms',
-                  }}
-                >
-                  →
-                </Box>
               </ListItemButton>
             </ListItem>
           );
         })}
       </List>
 
-      <Box sx={{ mt: 'auto', p: 2, borderTop: 2, borderColor: 'text.primary' }}>
-        <Typography variant="caption" color="text.secondary" component="p" sx={{ lineHeight: 1.6 }}>
-          Everything runs in your browser.
+      <Box sx={{ mt: 'auto', p: 2, borderTop: 1, borderColor: 'tokens.rule' }}>
+        <Typography variant="caption" color="text.secondary" component="p" sx={{ lineHeight: 1.7 }}>
+          Runs in your browser.
           <br />
-          Nothing is uploaded. Ever.
+          Nothing is uploaded.
         </Typography>
       </Box>
     </Box>
@@ -101,11 +88,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }) {
       >
         {drawer}
       </Drawer>
-      <Drawer
-        variant="permanent"
-        open
-        sx={{ display: { xs: 'none', md: 'block' }, '& .MuiDrawer-paper': paperSx }}
-      >
+      <Drawer variant="permanent" open sx={{ display: { xs: 'none', md: 'block' }, '& .MuiDrawer-paper': paperSx }}>
         {drawer}
       </Drawer>
     </Box>

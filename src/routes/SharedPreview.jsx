@@ -68,7 +68,7 @@ export default function SharedPreview() {
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ p: 1, borderBottom: 2, borderColor: 'text.primary', display: 'flex', alignItems: 'center', gap: 2, bgcolor: 'background.default' }}>
+      <Box sx={{ p: 1, borderBottom: 1, borderColor: 'tokens.rule', display: 'flex', alignItems: 'center', gap: 2, bgcolor: 'background.default' }}>
         <Button
           size="small"
           startIcon={<ArrowBack />}

@@ -3,6 +3,7 @@ import { Box, Toolbar } from '@mui/material';
 import Header from './Header';
 import Sidebar, { drawerWidth } from './Sidebar';
 import Footer from './Footer';
+import BootSequence from './BootSequence';
 
 export default function Layout({ children, isDarkMode, onThemeToggle }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -21,6 +22,7 @@ export default function Layout({ children, isDarkMode, onThemeToggle }) {
       >
         Skip to content
       </Box>
+      <BootSequence />
       <Header
         onMenuClick={() => setMobileOpen((o) => !o)}
         isDarkMode={isDarkMode}
@@ -38,7 +40,7 @@ export default function Layout({ children, isDarkMode, onThemeToggle }) {
           width: { md: `calc(100% - ${drawerWidth}px)` },
         }}
       >
-        <Toolbar sx={{ minHeight: { xs: 56, sm: 60 } }} />
+        <Toolbar sx={{ minHeight: { xs: 52, sm: 56 } }} />
         <Box sx={{ flexGrow: 1, px: { xs: 2, sm: 4, lg: 6 }, py: { xs: 3, sm: 5 }, maxWidth: 1440, width: '100%' }}>
           {children}
         </Box>

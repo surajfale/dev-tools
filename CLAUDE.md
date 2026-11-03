@@ -78,13 +78,15 @@ src/
 │   │   ├── Sidebar.jsx         # Tool navigation
 │   │   ├── Footer.jsx          # Footer with credits
 │   │   ├── toolRegistry.jsx    # Single source of truth for tool metadata
+│   │   ├── BootSequence.jsx    # Once-per-session intro overlay
 │   │   └── Layout.jsx          # Main layout wrapper
 │   └── Common/                 # Reusable utility components
 │       ├── CopyButton.jsx      # Clipboard functionality
 │       ├── DownloadButton.jsx  # File download
 │       ├── ErrorAlert.jsx      # Error display
 │       ├── PageHeader.jsx      # Spec-sheet tool header (T/0n, title, kbd hint)
-│       ├── CodeBlock.jsx       # Syntax-highlighted output with theme-derived Prism palette
+│       ├── CodeBlock.jsx       # Syntax-highlighted output with typing reveal
+│       ├── OrbitRings.jsx      # Decorative orbit diagram (dashboard hero)
 │       └── SampleInputButton.jsx # Load sample data
 └── lib/                        # Business logic utilities
     ├── formatJson.js           # JSON formatting/minifying
@@ -95,7 +97,8 @@ src/
     ├── previewHtml.js          # HTML sanitization for preview
     ├── minifyHtml.js           # HTML minification (30-60% reduction)
     ├── uploadHtml.js           # Cloud upload to pastebin services
-    └── calculateSum.js         # Math calculation utilities
+    ├── calculateSum.js         # Math calculation utilities
+    └── typewriter.js           # Output reveal timing + reduced-motion check
 ```
 
 ### State Management Patterns
@@ -123,12 +126,17 @@ Each tool follows this pattern:
 - Pure functions that accept input and options, return formatted output
 - Consistent error throwing for component error boundaries
 
-### Visual Design System ("Workbench Spec Sheet")
-- Brutalist/editorial look defined entirely in `src/theme.js`: warm paper + ink, one signal-orange accent, 0px radii, 2px rules, hard offset shadows (no blurred elevation), graph-paper body grid
-- Fonts (loaded in `index.html`): Archivo variable (display, condensed via `fontStretch`), IBM Plex Sans (body), JetBrains Mono (labels, buttons, code) — exported as `FONT_DISPLAY` / `FONT_BODY` / `FONT_MONO`
-- Palette: `primary` = ink, `secondary` = orange safe for text, `accent` = bright orange for FILLS ONLY (always with ink text), raw tokens on `theme.palette.workbench`
+### Visual Design System ("Mission Control")
+- Restrained HUD look defined in `src/theme.js`: graphite (dark) / blueprint (light) grounds, 1px hairline rules, 0px radii, bracketed corners (`bracketBackground()` helper) instead of full boxes, 32px plotting-grid body background, no drop shadows except on overlays
+- Fonts (loaded in `index.html`): Saira variable (display, condensed via `fontStretch`), IBM Plex Sans (body), JetBrains Mono (labels, buttons, code) — exported as `FONT_DISPLAY` / `FONT_BODY` / `FONT_MONO`
+- Palette: `primary` = ink, `secondary` = amber safe for text, `accent` = amber `#FFB020` for FILLS ONLY (always with `accent.contrastText`), raw tokens on `theme.palette.tokens` (usable in `sx`, e.g. `borderColor: 'tokens.rule'`)
+- Motion lives in three components only, and all of them respect `prefers-reduced-motion`:
+  - `Layout/BootSequence.jsx` — ~1s intro, once per browser session (sessionStorage), any key/click skips
+  - `Common/OrbitRings.jsx` — decorative orbit diagram on the dashboard (aria-hidden)
+  - `Common/CodeBlock.jsx` — new output types in line by line; timing planned by `src/lib/typewriter.js` (≈700ms, ≤40 re-renders, skipped above 200 lines)
 - Tool metadata (number, tag, title, description, icon) lives in `src/components/Layout/toolRegistry.jsx` — consumed by Sidebar, Dashboard and `PageHeader`
 - Every tool page starts with `<PageHeader title="…">description</PageHeader>` (`src/components/Common/PageHeader.jsx`)
+- Copy uses dry system-status wording (`SYS.NOMINAL · 0 uplinks`)
 - Don't hardcode colors/radii/shadows in components; check new color pairs for WCAG AA in both modes
 
 ### Material UI Integration

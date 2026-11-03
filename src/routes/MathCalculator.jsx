@@ -107,7 +107,7 @@ export default function MathCalculator() {
 
           {result ? (
             <Stack spacing={2}>
-              <Card elevation={3} sx={{ bgcolor: 'accent.main', color: 'accent.contrastText', boxShadow: (t) => `6px 6px 0 0 ${t.palette.text.primary}` }}>
+              <Card sx={{ background: (t) => t.palette.accent.main, color: 'accent.contrastText', borderColor: 'accent.main' }}>
                 <CardContent>
                   <Typography variant="subtitle2">
                     Sum
@@ -196,8 +196,8 @@ export default function MathCalculator() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '2px dashed',
-                borderColor: 'text.primary',
+                border: '1px dashed',
+                borderColor: 'tokens.rule',
                 borderRadius: 0,
                 bgcolor: 'background.paper'
               }}
