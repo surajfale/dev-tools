@@ -4,6 +4,7 @@ import {
   SETTINGS_STORAGE_KEY,
   normalizeSettings,
   shouldTypeOutput,
+  shouldPlayIntro,
   loadSettings,
   saveSettings,
 } from './settings';
@@ -30,18 +31,23 @@ const throwingStorage = {
 
 describe('normalizeSettings', () => {
   it('keeps valid typing modes', () => {
-    expect(normalizeSettings({ typing: 'off' })).toEqual({ typing: 'off' });
-    expect(normalizeSettings({ typing: 'always' })).toEqual({ typing: 'always' });
+    expect(normalizeSettings({ typing: 'off', intro: 'always' })).toEqual({ typing: 'off', intro: 'always' });
+    expect(normalizeSettings({ typing: 'always', intro: 'off' })).toEqual({ typing: 'always', intro: 'off' });
   });
 
   it('falls back to defaults for missing or invalid values', () => {
     expect(normalizeSettings(null)).toEqual(DEFAULT_SETTINGS);
-    expect(normalizeSettings({ typing: 'turbo' })).toEqual(DEFAULT_SETTINGS);
+    expect(normalizeSettings({ typing: 'turbo', intro: 'loud' })).toEqual(DEFAULT_SETTINGS);
     expect(normalizeSettings('nonsense')).toEqual(DEFAULT_SETTINGS);
   });
 
   it('drops unknown keys', () => {
-    expect(normalizeSettings({ typing: 'off', evil: true })).toEqual({ typing: 'off' });
+    expect(normalizeSettings({ typing: 'off', evil: true })).toEqual({ typing: 'off', intro: 'session' });
+  });
+
+  it('upgrades settings saved before a field existed', () => {
+    // A user who saved only `typing` keeps it and gets the default intro mode.
+    expect(normalizeSettings({ typing: 'off' })).toEqual({ typing: 'off', intro: 'session' });
   });
 });
 
@@ -60,11 +66,32 @@ describe('shouldTypeOutput', () => {
   });
 });
 
+describe('shouldPlayIntro', () => {
+  it('session plays only on the first load of a session', () => {
+    expect(shouldPlayIntro('session', { seenThisSession: false })).toBe(true);
+    expect(shouldPlayIntro('session', { seenThisSession: true })).toBe(false);
+  });
+
+  it('always plays on every load', () => {
+    expect(shouldPlayIntro('always', { seenThisSession: true })).toBe(true);
+  });
+
+  it('off never plays', () => {
+    expect(shouldPlayIntro('off')).toBe(false);
+  });
+
+  it('reduced motion suppresses every mode', () => {
+    for (const mode of ['session', 'always', 'off']) {
+      expect(shouldPlayIntro(mode, { reducedMotion: true })).toBe(false);
+    }
+  });
+});
+
 describe('loadSettings / saveSettings', () => {
   it('round-trips through storage', () => {
     const storage = memoryStorage();
-    expect(saveSettings(storage, { typing: 'off' })).toBe(true);
-    expect(loadSettings(storage)).toEqual({ typing: 'off' });
+    expect(saveSettings(storage, { typing: 'off', intro: 'always' })).toBe(true);
+    expect(loadSettings(storage)).toEqual({ typing: 'off', intro: 'always' });
   });
 
   it('returns defaults for empty or corrupt storage', () => {

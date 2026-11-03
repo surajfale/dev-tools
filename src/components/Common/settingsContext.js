@@ -5,9 +5,14 @@ import { DEFAULT_SETTINGS } from '../../lib/settings';
 export const SettingsContext = createContext({
   settings: DEFAULT_SETTINGS,
   updateSettings: () => {},
+  introRun: 0,
+  replayIntro: () => {},
 });
 
-/** `{ settings, updateSettings(partial) }` */
+/**
+ * `{ settings, updateSettings(partial), introRun, replayIntro() }`
+ * `introRun` increments each time the user asks to replay the intro.
+ */
 export function useSettings() {
   return useContext(SettingsContext);
 }

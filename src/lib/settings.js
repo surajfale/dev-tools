@@ -13,12 +13,26 @@ export const SETTINGS_STORAGE_KEY = 'devtools-settings';
  */
 export const TYPING_MODES = ['auto', 'always', 'off'];
 
-export const DEFAULT_SETTINGS = Object.freeze({ typing: 'auto' });
+/**
+ * When the boot/intro overlay plays:
+ *  - session: first page load of each browser session (default)
+ *  - always:  every full page load
+ *  - off:     never (it can still be replayed on demand from Settings)
+ * Unlike typing, no mode overrides reduced motion: a full-screen animation is
+ * far more intrusive than text revealing inside a panel.
+ */
+export const INTRO_MODES = ['session', 'always', 'off'];
+
+export const DEFAULT_SETTINGS = Object.freeze({ typing: 'auto', intro: 'session' });
+
+const pick = (value, allowed, fallback) => (allowed.includes(value) ? value : fallback);
 
 /** Coerce anything (stored JSON, partial objects, junk) into valid settings. */
 export function normalizeSettings(value) {
-  const typing = TYPING_MODES.includes(value?.typing) ? value.typing : DEFAULT_SETTINGS.typing;
-  return { typing };
+  return {
+    typing: pick(value?.typing, TYPING_MODES, DEFAULT_SETTINGS.typing),
+    intro: pick(value?.intro, INTRO_MODES, DEFAULT_SETTINGS.intro),
+  };
 }
 
 /** Whether the typing reveal should run for a given mode and OS preference. */
@@ -26,6 +40,13 @@ export function shouldTypeOutput(mode, reducedMotion) {
   if (mode === 'always') return true;
   if (mode === 'off') return false;
   return !reducedMotion;
+}
+
+/** Whether the intro should play automatically on this page load. */
+export function shouldPlayIntro(mode, { reducedMotion = false, seenThisSession = false } = {}) {
+  if (mode === 'off' || reducedMotion) return false;
+  if (mode === 'always') return true;
+  return !seenThisSession;
 }
 
 /** Read settings from a Storage-like object; never throws. */

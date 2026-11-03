@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { prefersReducedMotion } from '../../lib/typewriter';
+import { shouldPlayIntro } from '../../lib/settings';
+import { useSettings } from '../Common/settingsContext';
 import { tools } from './toolRegistry';
 
 const STORAGE_KEY = 'mc-boot-seen';
@@ -13,24 +15,37 @@ const LINES = [
   [`LOAD instruments [${String(tools.length).padStart(2, '0')}]`, 'OK'],
 ];
 
-function shouldBoot() {
-  if (typeof window === 'undefined' || prefersReducedMotion()) return false;
+function seenThisSession() {
   try {
-    return window.sessionStorage.getItem(STORAGE_KEY) !== '1';
+    return window.sessionStorage.getItem(STORAGE_KEY) === '1';
   } catch {
-    // Storage blocked (private mode etc.): skip rather than replay every load.
-    return false;
+    // Storage blocked (private mode etc.): treat as seen rather than replaying every load.
+    return true;
   }
 }
 
 /**
- * One-time-per-session intro overlay. Purely decorative (aria-hidden), about
- * one second long, and any key press or click dismisses it immediately.
- * Never shown when the user prefers reduced motion.
+ * Intro overlay. Purely decorative (aria-hidden), about one second long, and
+ * any key press or click dismisses it immediately. Whether it plays on load is
+ * the user's "Intro sequence" setting (see shouldPlayIntro); it never plays
+ * automatically under reduced motion, but an explicit "Play intro now" from
+ * the settings menu always plays it.
  */
 export default function BootSequence() {
-  const [visible, setVisible] = useState(shouldBoot);
+  const { settings, introRun } = useSettings();
+  const [visible, setVisible] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      shouldPlayIntro(settings.intro, { reducedMotion: prefersReducedMotion(), seenThisSession: seenThisSession() }),
+  );
   const [step, setStep] = useState(0);
+
+  // Explicit replay request from the settings menu.
+  useEffect(() => {
+    if (introRun === 0) return;
+    setStep(0);
+    setVisible(true);
+  }, [introRun]);
 
   useEffect(() => {
     if (!visible) return undefined;

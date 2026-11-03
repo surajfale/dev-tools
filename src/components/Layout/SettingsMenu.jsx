@@ -1,24 +1,54 @@
-import { useState } from 'react';
-import { IconButton, Menu, MenuItem, ListSubheader, Tooltip, Box, Typography } from '@mui/material';
-import { TuneOutlined, Check } from '@mui/icons-material';
+import { Fragment, useState } from 'react';
+import { IconButton, Menu, MenuItem, ListSubheader, Tooltip, Box, Typography, Divider } from '@mui/material';
+import { TuneOutlined, Check, PlayArrowOutlined } from '@mui/icons-material';
 import { useSettings } from '../Common/settingsContext';
 
-const TYPING_OPTIONS = [
-  { value: 'auto', label: 'Auto', hint: 'Type it out unless your system asks for reduced motion' },
-  { value: 'always', label: 'Always type', hint: 'Line-by-line reveal, even with reduced motion' },
-  { value: 'off', label: 'Instant', hint: 'Show formatted output immediately' },
+/** Each section is one radio group bound to a key in `settings`. */
+const SECTIONS = [
+  {
+    key: 'typing',
+    title: 'Output typing',
+    options: [
+      { value: 'auto', label: 'Auto', hint: 'Type it out unless your system asks for reduced motion' },
+      { value: 'always', label: 'Always type', hint: 'Line-by-line reveal, even with reduced motion' },
+      { value: 'off', label: 'Instant', hint: 'Show formatted output immediately' },
+    ],
+  },
+  {
+    key: 'intro',
+    title: 'Intro sequence',
+    options: [
+      { value: 'session', label: 'Once per session', hint: 'Plays on the first visit after opening the browser' },
+      { value: 'always', label: 'Every visit', hint: 'Plays on every full page load' },
+      { value: 'off', label: 'Never', hint: 'Skip it. Always skipped with reduced motion' },
+    ],
+  },
 ];
 
-/** Header control for user preferences (currently: how output appears). */
+const subheaderSx = {
+  typography: 'overline',
+  color: 'text.secondary',
+  bgcolor: 'transparent',
+  lineHeight: 2.6,
+  borderBottom: 1,
+  borderColor: 'divider',
+};
+
+function OptionText({ label, hint }) {
+  return (
+    <Box>
+      <Typography sx={{ fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 600 }}>{label}</Typography>
+      {hint && <Typography sx={{ fontSize: '0.78rem', opacity: 0.85, lineHeight: 1.4 }}>{hint}</Typography>}
+    </Box>
+  );
+}
+
+/** Header control for user preferences: output typing and the intro sequence. */
 export default function SettingsMenu({ sx }) {
-  const { settings, updateSettings } = useSettings();
+  const { settings, updateSettings, replayIntro } = useSettings();
   const [anchor, setAnchor] = useState(null);
   const open = Boolean(anchor);
-
-  const choose = (typing) => {
-    updateSettings({ typing });
-    setAnchor(null);
-  };
+  const close = () => setAnchor(null);
 
   return (
     <>
@@ -40,36 +70,49 @@ export default function SettingsMenu({ sx }) {
         id="settings-menu"
         anchorEl={anchor}
         open={open}
-        onClose={() => setAnchor(null)}
+        onClose={close}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         MenuListProps={{ 'aria-labelledby': 'settings-button', dense: true, sx: { py: 0, width: 300 } }}
       >
-        <ListSubheader
-          disableSticky
-          sx={{ typography: 'overline', color: 'text.secondary', bgcolor: 'transparent', lineHeight: 2.6, borderBottom: 1, borderColor: 'divider' }}
+        {SECTIONS.map((section, i) => (
+          <Fragment key={section.key}>
+            {i > 0 && <Divider sx={{ my: '0 !important' }} />}
+            <ListSubheader disableSticky sx={subheaderSx}>
+              {section.title}
+            </ListSubheader>
+            {section.options.map((opt) => {
+              const checked = settings[section.key] === opt.value;
+              return (
+                <MenuItem
+                  key={opt.value}
+                  role="menuitemradio"
+                  aria-checked={checked}
+                  selected={checked}
+                  onClick={() => {
+                    updateSettings({ [section.key]: opt.value });
+                    close();
+                  }}
+                  sx={{ alignItems: 'flex-start', gap: 1.5, py: 1.25, whiteSpace: 'normal' }}
+                >
+                  <Box sx={{ width: 18, pt: 0.25, flexShrink: 0 }}>{checked && <Check sx={{ fontSize: 18 }} />}</Box>
+                  <OptionText label={opt.label} hint={opt.hint} />
+                </MenuItem>
+              );
+            })}
+          </Fragment>
+        ))}
+        <Divider sx={{ my: '0 !important' }} />
+        <MenuItem
+          onClick={() => {
+            close();
+            replayIntro();
+          }}
+          sx={{ gap: 1.5, py: 1.25 }}
         >
-          Output typing
-        </ListSubheader>
-        {TYPING_OPTIONS.map((opt) => {
-          const checked = settings.typing === opt.value;
-          return (
-            <MenuItem
-              key={opt.value}
-              role="menuitemradio"
-              aria-checked={checked}
-              selected={checked}
-              onClick={() => choose(opt.value)}
-              sx={{ alignItems: 'flex-start', gap: 1.5, py: 1.25, whiteSpace: 'normal' }}
-            >
-              <Box sx={{ width: 18, pt: 0.25, flexShrink: 0 }}>{checked && <Check sx={{ fontSize: 18 }} />}</Box>
-              <Box>
-                <Typography sx={{ fontFamily: 'inherit', fontSize: '0.85rem', fontWeight: 600 }}>{opt.label}</Typography>
-                <Typography sx={{ fontSize: '0.78rem', opacity: 0.85, lineHeight: 1.4 }}>{opt.hint}</Typography>
-              </Box>
-            </MenuItem>
-          );
-        })}
+          <PlayArrowOutlined sx={{ fontSize: 18 }} />
+          <OptionText label="Play intro now" />
+        </MenuItem>
       </Menu>
     </>
   );

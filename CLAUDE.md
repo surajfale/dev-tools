@@ -79,7 +79,7 @@ src/
 │   │   ├── Footer.jsx          # Footer with credits
 │   │   ├── toolRegistry.jsx    # Single source of truth for tool metadata
 │   │   ├── BootSequence.jsx    # Once-per-session intro overlay
-│   │   ├── SettingsMenu.jsx    # Header settings menu (output typing mode)
+│   │   ├── SettingsMenu.jsx    # Header settings menu (output typing, intro sequence, replay)
 │   │   └── Layout.jsx          # Main layout wrapper
 │   └── Common/                 # Reusable utility components
 │       ├── CopyButton.jsx      # Clipboard functionality
@@ -136,7 +136,7 @@ Each tool follows this pattern:
 - Fonts (loaded in `index.html`): Saira variable (display, condensed via `fontStretch`), IBM Plex Sans (body), JetBrains Mono (labels, buttons, code) — exported as `FONT_DISPLAY` / `FONT_BODY` / `FONT_MONO`
 - Palette: `primary` = ink, `secondary` = amber safe for text, `accent` = amber `#FFB020` for FILLS ONLY (always with `accent.contrastText`), raw tokens on `theme.palette.tokens` (usable in `sx`, e.g. `borderColor: 'tokens.rule'`)
 - Motion lives in three components only, and all of them respect `prefers-reduced-motion`:
-  - `Layout/BootSequence.jsx` — ~1s intro, once per browser session (sessionStorage), any key/click skips
+  - `Layout/BootSequence.jsx` — ~1s intro, any key/click skips. Governed by the **Intro sequence** setting (`session` default via sessionStorage, `always`, `off`); never auto-plays under reduced motion, but "Play intro now" (`replayIntro()` from `useSettings()`) always plays it
   - `Common/OrbitRings.jsx` — decorative orbit diagram on the dashboard (aria-hidden)
   - `Common/CodeBlock.jsx` — new output types in line by line; timing planned by `src/lib/typewriter.js` (≈700ms, ≤40 re-renders, skipped above 200 lines). Governed by the user's **Output typing** setting (`auto` follows reduced-motion, `always`, `off`)
 - Tool metadata (number, tag, title, description, icon) lives in `src/components/Layout/toolRegistry.jsx` — consumed by Sidebar, Dashboard and `PageHeader`
