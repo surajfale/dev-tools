@@ -37,7 +37,7 @@ pnpm deploy:netlify
 ## Package Manager Configuration
 
 - **Required**: pnpm (configured in `packageManager` field)
-- **Node Version**: 20.20.2 (specified in `.nvmrc`; required by react-router-dom v7)
+- **Node Version**: 24.22.2 LTS (specified in `.nvmrc`; react-router-dom v7 needs ≥20)
 
 ## Architecture Overview
 
