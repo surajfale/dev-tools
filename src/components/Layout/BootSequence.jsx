@@ -39,16 +39,22 @@ export default function BootSequence() {
       shouldPlayIntro(settings.intro, { reducedMotion: prefersReducedMotion(), seenThisSession: seenThisSession() }),
   );
   const [step, setStep] = useState(0);
+  const [lastIntroRun, setLastIntroRun] = useState(introRun);
 
-  // Explicit replay request from the settings menu.
-  useEffect(() => {
-    if (introRun === 0) return;
+  // Explicit replay request from the settings menu. Adjusting state while
+  // rendering (instead of in an effect) avoids an extra committed frame.
+  if (introRun !== lastIntroRun) {
+    setLastIntroRun(introRun);
     setStep(0);
     setVisible(true);
-  }, [introRun]);
+  }
+
+  // lines… headline… one beat to read it… done
+  const finished = step > LINES.length + 3;
+  const showing = visible && !finished;
 
   useEffect(() => {
-    if (!visible) return undefined;
+    if (!showing) return undefined;
     try {
       window.sessionStorage.setItem(STORAGE_KEY, '1');
     } catch {
@@ -63,14 +69,9 @@ export default function BootSequence() {
       window.removeEventListener('keydown', skip);
       window.removeEventListener('pointerdown', skip);
     };
-  }, [visible]);
+  }, [showing]);
 
-  useEffect(() => {
-    // lines… headline… one beat to read it… done
-    if (step > LINES.length + 3) setVisible(false);
-  }, [step]);
-
-  if (!visible) return null;
+  if (!showing) return null;
 
   return (
     <Box

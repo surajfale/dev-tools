@@ -17,13 +17,11 @@ const pad = (n) => String(n).padStart(2, '0');
 
 /** Instrument-style readout: digits scramble briefly, then settle on the value. */
 function Readout({ value }) {
-  const [display, setDisplay] = useState(() => (prefersReducedMotion() ? value : 0));
+  const reduced = prefersReducedMotion();
+  const [display, setDisplay] = useState(() => (reduced ? value : 0));
 
   useEffect(() => {
-    if (prefersReducedMotion()) {
-      setDisplay(value);
-      return undefined;
-    }
+    if (reduced) return undefined; // rendered directly below, no animation
     let step = 0;
     const id = setInterval(() => {
       step += 1;
@@ -35,9 +33,9 @@ function Readout({ value }) {
       }
     }, 45);
     return () => clearInterval(id);
-  }, [value]);
+  }, [value, reduced]);
 
-  return <>{pad(display)}</>;
+  return <>{pad(reduced ? value : display)}</>;
 }
 
 export default function Dashboard() {
