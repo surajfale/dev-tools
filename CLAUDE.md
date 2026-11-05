@@ -94,9 +94,11 @@ src/
 │       ├── CodeBlock.jsx       # Syntax-highlighted output with typing reveal
 │       ├── OrbitRings.jsx      # Decorative orbit diagram (dashboard hero)
 │       ├── OutputPopout.jsx    # Full-screen output view + PopoutButton (JSON, SQL)
+│       ├── ToolActionBar.jsx   # Run/Clear/Sample/Paste row; fixed bottom bar on phones
+│       ├── useStoredState.js   # useState persisted per tool (Remember input setting)
+│       ├── useRevealOnPhone.js # Scroll output into view after a run on phones
 │       ├── SettingsProvider.jsx # User settings state + localStorage sync
 │       ├── settingsContext.js  # SettingsContext + useSettings() hook
-│       └── SampleInputButton.jsx # Load sample data
 └── lib/                        # Business logic utilities
     ├── formatJson.js           # JSON formatting/minifying
     ├── formatSql.js            # SQL dialect formatting
@@ -108,6 +110,7 @@ src/
     ├── uploadHtml.js           # Cloud upload to pastebin services
     ├── calculateSum.js         # Math calculation utilities
     ├── settings.js             # Settings defaults, validation, persistence
+    ├── storedInput.js          # Per-tool input persistence helpers (read/write/purge)
     └── typewriter.js           # Output reveal timing + reduced-motion check
 ```
 
@@ -201,11 +204,18 @@ All utility functions follow a consistent return pattern:
 - `OutputPopout` owns no formatting state; pass it `code`, `language`, `filename`, `toolbar`, and `error` (an option change made inside it can fail, e.g. a SQL dialect switch)
 - Its `CodeBlock` uses `fill` and `animate={false}`: toggles are view changes, so they never replay the typing reveal
 
+#### Mobile / Installed App (most use is the installed PWA on an Android phone)
+- Every tool's action row is `<ToolActionBar primary={…} actions={[…]} onPaste={setInput} />`, never a hand-rolled `Stack` of buttons. On phones (<600px) it becomes a fixed bottom bar: icon buttons plus a full-width primary action, above the gesture bar (`env(safe-area-inset-bottom)`) and above the keyboard (`interactive-widget=resizes-content` in `index.html`). Global CSS in `theme.js` pads `<main>` and lifts bottom snackbars while a bar is mounted
+- Tool input uses `useStoredState('<tool>.input', '')` (and the same for any state the input depends on, e.g. `direction` with a validator). It honours the **Remember input** setting (`remember: 'on' | 'off'`, default on); turning it off purges every `devtools-input:*` key. Values over 500k chars are not stored
+- After a successful run call `revealOutput()` from `useRevealOnPhone()`, with its `ref` and `scrollMarginTop: 64` on the output column
+- Text fields get `autoCapitalize/autoCorrect/autoComplete="off"` and `spellCheck={false}` from the theme; don't override them on code inputs
+- Touch targets are ≥48px on phones (theme `PHONE` media query on buttons and icon buttons)
+
 #### Common Component Props
 - All tools accept `input` and options via controlled components
 - Use Material UI `TextField` with `minRows={12}` for multiline text areas (Material UI automatically enables multiline mode when minRows/maxRows is set)
 - Use `ErrorAlert` for consistent error messaging
-- Include `CopyButton`, `DownloadButton`, and `SampleInputButton` actions
+- Include `CopyButton` and `DownloadButton` on the output; Sample/Clear/Paste live in `ToolActionBar`
 - Maintain keyboard shortcut support (Ctrl/Cmd+Enter) using `useEffect` with keydown event listener
 
 ## Commit Message Guidelines

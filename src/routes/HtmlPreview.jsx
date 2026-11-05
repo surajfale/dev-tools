@@ -12,13 +12,15 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
-import { Clear, Visibility, Code as CodeIcon, Share, OpenInNew } from '@mui/icons-material';
+import { Clear, Visibility, Code as CodeIcon, Share, OpenInNew, ScienceOutlined } from '@mui/icons-material';
 import { sanitizeHtml } from '../lib/previewHtml';
 import { minifyHtml, calculateCompression } from '../lib/minifyHtml';
 import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
-import SampleInputButton from '../components/Common/SampleInputButton';
+import ToolActionBar from '../components/Common/ToolActionBar';
+import useStoredState from '../components/Common/useStoredState';
+import useRevealOnPhone from '../components/Common/useRevealOnPhone';
 import CodeBlock from '../components/Common/CodeBlock';
 import PageHeader from '../components/Common/PageHeader';
 
@@ -69,9 +71,10 @@ const sampleHtml = `<!DOCTYPE html>
 </html>`;
 
 export default function HtmlPreview() {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useStoredState('htmlpreview.input', '');
   const [sanitizedHtml, setSanitizedHtml] = useState('');
   const [error, setError] = useState('');
+  const [outputRef, revealOutput] = useRevealOnPhone();
   const [activeTab, setActiveTab] = useState(0);
   const [shareableUrl, setShareableUrl] = useState('');
   const [showCopyAlert, setShowCopyAlert] = useState(false);
@@ -83,6 +86,7 @@ export default function HtmlPreview() {
     if (result.success) {
       setSanitizedHtml(result.result);
       setError('');
+      revealOutput();
       setActiveTab(0); // Switch to preview tab
       // Clear previous shareable URL and stats
       setShareableUrl('');
@@ -93,7 +97,7 @@ export default function HtmlPreview() {
       setShareableUrl('');
       setCompressionStats(null);
     }
-  }, [input]);
+  }, [input, revealOutput]);
 
   const handleClear = () => {
     setInput('');
@@ -217,27 +221,17 @@ export default function HtmlPreview() {
             minRows={20}
             aria-label="HTML input"
           />
-          <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<Visibility />}
-              onClick={handlePreview}
-              disabled={!input.trim()}
-            >
-              Preview
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<Clear />}
-              onClick={handleClear}
-            >
-              Clear
-            </Button>
-            <SampleInputButton onLoadSample={handleLoadSample} />
-          </Stack>
+          <ToolActionBar
+            primary={{ label: 'Preview', icon: <Visibility />, onClick: handlePreview, disabled: !input.trim() }}
+            actions={[
+              { label: 'Clear', icon: <Clear />, onClick: handleClear },
+              { label: 'Sample', ariaLabel: 'Load sample input', icon: <ScienceOutlined />, onClick: handleLoadSample, color: 'secondary' },
+            ]}
+            onPaste={setInput}
+          />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 6 }} ref={outputRef} sx={{ scrollMarginTop: 64 }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
             <Tabs value={activeTab} onChange={(e, val) => setActiveTab(val)}>
               <Tab label="Preview" icon={<Visibility />} iconPosition="start" />

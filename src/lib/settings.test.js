@@ -31,8 +31,8 @@ const throwingStorage = {
 
 describe('normalizeSettings', () => {
   it('keeps valid typing modes', () => {
-    expect(normalizeSettings({ typing: 'off', intro: 'always' })).toEqual({ typing: 'off', intro: 'always' });
-    expect(normalizeSettings({ typing: 'always', intro: 'off' })).toEqual({ typing: 'always', intro: 'off' });
+    expect(normalizeSettings({ typing: 'off', intro: 'always' })).toEqual({ typing: 'off', intro: 'always', remember: 'on' });
+    expect(normalizeSettings({ typing: 'always', intro: 'off' })).toEqual({ typing: 'always', intro: 'off', remember: 'on' });
   });
 
   it('falls back to defaults for missing or invalid values', () => {
@@ -41,13 +41,18 @@ describe('normalizeSettings', () => {
     expect(normalizeSettings('nonsense')).toEqual(DEFAULT_SETTINGS);
   });
 
+  it('keeps a valid remember mode and rejects junk', () => {
+    expect(normalizeSettings({ remember: 'off' }).remember).toBe('off');
+    expect(normalizeSettings({ remember: true }).remember).toBe('on');
+  });
+
   it('drops unknown keys', () => {
-    expect(normalizeSettings({ typing: 'off', evil: true })).toEqual({ typing: 'off', intro: 'session' });
+    expect(normalizeSettings({ typing: 'off', evil: true })).toEqual({ typing: 'off', intro: 'session', remember: 'on' });
   });
 
   it('upgrades settings saved before a field existed', () => {
     // A user who saved only `typing` keeps it and gets the default intro mode.
-    expect(normalizeSettings({ typing: 'off' })).toEqual({ typing: 'off', intro: 'session' });
+    expect(normalizeSettings({ typing: 'off' })).toEqual({ typing: 'off', intro: 'session', remember: 'on' });
   });
 });
 
@@ -91,7 +96,7 @@ describe('loadSettings / saveSettings', () => {
   it('round-trips through storage', () => {
     const storage = memoryStorage();
     expect(saveSettings(storage, { typing: 'off', intro: 'always' })).toBe(true);
-    expect(loadSettings(storage)).toEqual({ typing: 'off', intro: 'always' });
+    expect(loadSettings(storage)).toEqual({ typing: 'off', intro: 'always', remember: 'on' });
   });
 
   it('returns defaults for empty or corrupt storage', () => {

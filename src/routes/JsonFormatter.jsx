@@ -10,15 +10,16 @@ import {
   Select,
   MenuItem,
   Box,
-  Button,
   Stack,
 } from '@mui/material';
-import { Clear, FormatAlignLeft } from '@mui/icons-material';
+import { Clear, FormatAlignLeft, ScienceOutlined, ErrorOutlineOutlined } from '@mui/icons-material';
 import { formatJson } from '../lib/formatJson';
 import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
-import SampleInputButton from '../components/Common/SampleInputButton';
+import ToolActionBar from '../components/Common/ToolActionBar';
+import useStoredState from '../components/Common/useStoredState';
+import useRevealOnPhone from '../components/Common/useRevealOnPhone';
 import CodeBlock from '../components/Common/CodeBlock';
 import PageHeader from '../components/Common/PageHeader';
 import OutputPopout, { PopoutButton } from '../components/Common/OutputPopout';
@@ -74,7 +75,7 @@ function JsonOptions({ idPrefix, indent, onIndent, minify, onMinify, sortKeys, o
 }
 
 export default function JsonFormatter() {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useStoredState('json.input', '');
   // The input that produced the current result. Output is derived from it, so
   // option changes (sort, minify, indent) re-apply instantly, and turning Sort
   // off restores the original key order instead of re-formatting sorted output.
@@ -84,6 +85,7 @@ export default function JsonFormatter() {
   const [minify, setMinify] = useState(false);
   const [sortKeys, setSortKeys] = useState(false);
   const [popoutOpen, setPopoutOpen] = useState(false);
+  const [outputRef, revealOutput] = useRevealOnPhone();
 
   const output = useMemo(() => {
     if (source === null) return '';
@@ -97,11 +99,12 @@ export default function JsonFormatter() {
     if (result.success) {
       setSource(input);
       setError('');
+      revealOutput();
     } else {
       setError(result.error);
       setSource(null);
     }
-  }, [input, indent, minify, sortKeys]);
+  }, [input, indent, minify, sortKeys, revealOutput]);
 
   const handleClear = () => {
     setInput('');
@@ -162,21 +165,18 @@ export default function JsonFormatter() {
             minRows={12}
             aria-label="JSON input"
           />
-          <Stack direction="row" spacing={1} sx={{ mt: 2 }} flexWrap="wrap" useFlexGap>
-            <Button variant="contained" startIcon={<FormatAlignLeft />} onClick={handleFormat} disabled={!input.trim()}>
-              Format
-            </Button>
-            <Button variant="outlined" startIcon={<Clear />} onClick={handleClear}>
-              Clear
-            </Button>
-            <SampleInputButton onLoadSample={handleLoadSample} />
-            <Button size="small" variant="outlined" color="error" onClick={handleLoadInvalid} aria-label="Load invalid JSON sample">
-              Invalid Sample
-            </Button>
-          </Stack>
+          <ToolActionBar
+            primary={{ label: 'Format', icon: <FormatAlignLeft />, onClick: handleFormat, disabled: !input.trim() }}
+            actions={[
+              { label: 'Clear', icon: <Clear />, onClick: handleClear },
+              { label: 'Sample', ariaLabel: 'Load sample input', icon: <ScienceOutlined />, onClick: handleLoadSample, color: 'secondary' },
+              { label: 'Invalid Sample', ariaLabel: 'Load invalid JSON sample', icon: <ErrorOutlineOutlined />, onClick: handleLoadInvalid, color: 'error' },
+            ]}
+            onPaste={setInput}
+          />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 6 }} ref={outputRef} sx={{ scrollMarginTop: 64 }}>
           <Typography variant="h6" gutterBottom>
             Formatted Output
           </Typography>

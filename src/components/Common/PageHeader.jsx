@@ -13,7 +13,7 @@ export default function PageHeader({ title, children, shortcut = true }) {
   const tool = findTool(pathname);
 
   return (
-    <Box component="header" sx={{ mb: 4 }}>
+    <Box component="header" sx={{ mb: { xs: 2.5, sm: 4 } }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
         {tool && (
           <Box
@@ -39,7 +39,7 @@ export default function PageHeader({ title, children, shortcut = true }) {
       <Typography
         variant="h4"
         component="h1"
-        sx={{ fontSize: { xs: '2.6rem', sm: '3.5rem', md: '4rem' }, mb: 1.5, textWrap: 'balance' }}
+        sx={{ fontSize: { xs: '2.1rem', sm: '3.5rem', md: '4rem' }, mb: { xs: 0.5, sm: 1.5 }, textWrap: 'balance' }}
       >
         {title}
       </Typography>
@@ -53,7 +53,8 @@ export default function PageHeader({ title, children, shortcut = true }) {
           gap: 2,
         }}
       >
-        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: '68ch' }}>
+        {/* Hidden on phones: the first screen is for the input, not prose. */}
+        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: '68ch', display: { xs: 'none', sm: 'block' } }}>
           {children}
         </Typography>
         {shortcut && (

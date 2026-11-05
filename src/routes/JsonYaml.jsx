@@ -4,7 +4,6 @@ import {
   Grid,
   TextField,
   Box,
-  Button,
   Stack,
   FormControl,
   InputLabel,
@@ -13,12 +12,14 @@ import {
   FormControlLabel,
   Switch
 } from '@mui/material';
-import { Clear, Transform } from '@mui/icons-material';
+import { Clear, Transform, ScienceOutlined } from '@mui/icons-material';
 import { convertJsonToYaml, convertYamlToJson } from '../lib/convertJsonYaml';
 import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
-import SampleInputButton from '../components/Common/SampleInputButton';
+import ToolActionBar from '../components/Common/ToolActionBar';
+import useStoredState from '../components/Common/useStoredState';
+import useRevealOnPhone from '../components/Common/useRevealOnPhone';
 import CodeBlock from '../components/Common/CodeBlock';
 import PageHeader from '../components/Common/PageHeader';
 
@@ -67,11 +68,15 @@ data:
     - https://example.com
     - https://app.example.com`;
 
+const DIRECTIONS = ['json-to-yaml', 'yaml-to-json'];
+const isDirection = (v) => DIRECTIONS.includes(v);
+
 export default function JsonYaml() {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useStoredState('jsonyaml.input', '');
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
-  const [direction, setDirection] = useState('json-to-yaml');
+  const [outputRef, revealOutput] = useRevealOnPhone();
+  const [direction, setDirection] = useStoredState('jsonyaml.direction', 'json-to-yaml', isDirection);
   const [indent, setIndent] = useState(2);
   const [minify, setMinify] = useState(false);
 
@@ -87,11 +92,12 @@ export default function JsonYaml() {
     if (result.success) {
       setOutput(result.result);
       setError('');
+      revealOutput();
     } else {
       setError(result.error);
       setOutput('');
     }
-  }, [input, direction, indent, minify]);
+  }, [input, direction, indent, minify, revealOutput]);
 
   const handleClear = () => {
     setInput('');
@@ -197,27 +203,17 @@ export default function JsonYaml() {
             minRows={12}
             aria-label={inputLabel}
           />
-          <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<Transform />}
-              onClick={handleConvert}
-              disabled={!input.trim()}
-            >
-              Convert
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<Clear />}
-              onClick={handleClear}
-            >
-              Clear
-            </Button>
-            <SampleInputButton onLoadSample={handleLoadSample} />
-          </Stack>
+          <ToolActionBar
+            primary={{ label: 'Convert', icon: <Transform />, onClick: handleConvert, disabled: !input.trim() }}
+            actions={[
+              { label: 'Clear', icon: <Clear />, onClick: handleClear },
+              { label: 'Sample', ariaLabel: 'Load sample input', icon: <ScienceOutlined />, onClick: handleLoadSample, color: 'secondary' },
+            ]}
+            onPaste={setInput}
+          />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 6 }} ref={outputRef} sx={{ scrollMarginTop: 64 }}>
           <Typography variant="h6" gutterBottom>
             {outputLabel}
           </Typography>

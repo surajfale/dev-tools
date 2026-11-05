@@ -23,7 +23,15 @@ export const TYPING_MODES = ['auto', 'always', 'off'];
  */
 export const INTRO_MODES = ['session', 'always', 'off'];
 
-export const DEFAULT_SETTINGS = Object.freeze({ typing: 'auto', intro: 'session' });
+/**
+ * Whether each tool's input survives navigation and app restarts:
+ *  - on:  kept in localStorage on this device (default; Android often kills
+ *         a backgrounded installed app, which would otherwise lose a paste)
+ *  - off: in-memory only; switching it off also deletes what was stored
+ */
+export const REMEMBER_MODES = ['on', 'off'];
+
+export const DEFAULT_SETTINGS = Object.freeze({ typing: 'auto', intro: 'session', remember: 'on' });
 
 const pick = (value, allowed, fallback) => (allowed.includes(value) ? value : fallback);
 
@@ -32,6 +40,7 @@ export function normalizeSettings(value) {
   return {
     typing: pick(value?.typing, TYPING_MODES, DEFAULT_SETTINGS.typing),
     intro: pick(value?.intro, INTRO_MODES, DEFAULT_SETTINGS.intro),
+    remember: pick(value?.remember, REMEMBER_MODES, DEFAULT_SETTINGS.remember),
   };
 }
 
