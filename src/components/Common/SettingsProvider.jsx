@@ -1,6 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SettingsContext } from './settingsContext';
 import { loadSettings, normalizeSettings, saveSettings } from '../../lib/settings';
+import { purgeStored } from '../../lib/storedInput';
 
 const storage = () => (typeof window === 'undefined' ? undefined : window.localStorage);
 
@@ -19,6 +20,13 @@ export default function SettingsProvider({ children }) {
       return next;
     });
   }, []);
+
+  // Turning "Remember input" off deletes what was stored, not just future writes.
+  // Parent effects run after the children's cleanups, so this also wins over a
+  // tool's final unmount/flush write in the same commit.
+  useEffect(() => {
+    if (settings.remember === 'off') purgeStored(storage());
+  }, [settings.remember]);
 
   const [introRun, setIntroRun] = useState(0);
   const replayIntro = useCallback(() => setIntroRun((n) => n + 1), []);

@@ -41,7 +41,7 @@ export default function Layout({ children, isDarkMode, onThemeToggle }) {
         }}
       >
         <Toolbar sx={{ minHeight: { xs: 52, sm: 56 } }} />
-        <Box sx={{ flexGrow: 1, px: { xs: 2, sm: 4, lg: 6 }, py: { xs: 3, sm: 5 }, maxWidth: 1440, width: '100%' }}>
+        <Box sx={{ flexGrow: 1, px: { xs: 2, sm: 4, lg: 6 }, py: { xs: 2, sm: 5 }, maxWidth: 1440, width: '100%' }}>
           {children}
         </Box>
         <Footer />

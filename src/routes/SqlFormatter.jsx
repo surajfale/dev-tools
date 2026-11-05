@@ -10,15 +10,16 @@ import {
   Select,
   MenuItem,
   Box,
-  Button,
   Stack
 } from '@mui/material';
-import { Clear, FormatAlignLeft } from '@mui/icons-material';
+import { Clear, FormatAlignLeft, ScienceOutlined } from '@mui/icons-material';
 import { formatSql, sqlDialects } from '../lib/formatSql';
 import CopyButton from '../components/Common/CopyButton';
 import DownloadButton from '../components/Common/DownloadButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
-import SampleInputButton from '../components/Common/SampleInputButton';
+import ToolActionBar from '../components/Common/ToolActionBar';
+import useStoredState from '../components/Common/useStoredState';
+import useRevealOnPhone from '../components/Common/useRevealOnPhone';
 import CodeBlock from '../components/Common/CodeBlock';
 import PageHeader from '../components/Common/PageHeader';
 import OutputPopout, { PopoutButton } from '../components/Common/OutputPopout';
@@ -58,11 +59,12 @@ function SqlOptions({ idPrefix, dialect, onDialect, indentSize, onIndentSize, up
 }
 
 export default function SqlFormatter() {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useStoredState('sql.input', '');
   // The input behind the current result; output is derived from it so option
   // changes re-apply instantly on the page and in the popout.
   const [source, setSource] = useState(null);
   const [error, setError] = useState('');
+  const [outputRef, revealOutput] = useRevealOnPhone();
   const [dialect, setDialect] = useState('sql');
   const [uppercase, setUppercase] = useState(true);
   const [indentSize, setIndentSize] = useState(2);
@@ -83,11 +85,12 @@ export default function SqlFormatter() {
     if (result.success) {
       setSource(input);
       setError('');
+      revealOutput();
     } else {
       setError(result.error);
       setSource(null);
     }
-  }, [input, dialect, uppercase, indentSize]);
+  }, [input, dialect, uppercase, indentSize, revealOutput]);
 
   const handleClear = () => {
     setInput('');
@@ -143,27 +146,17 @@ export default function SqlFormatter() {
             minRows={12}
             aria-label="SQL input"
           />
-          <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<FormatAlignLeft />}
-              onClick={handleFormat}
-              disabled={!input.trim()}
-            >
-              Format
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<Clear />}
-              onClick={handleClear}
-            >
-              Clear
-            </Button>
-            <SampleInputButton onLoadSample={handleLoadSample} />
-          </Stack>
+          <ToolActionBar
+            primary={{ label: 'Format', icon: <FormatAlignLeft />, onClick: handleFormat, disabled: !input.trim() }}
+            actions={[
+              { label: 'Clear', icon: <Clear />, onClick: handleClear },
+              { label: 'Sample', ariaLabel: 'Load sample input', icon: <ScienceOutlined />, onClick: handleLoadSample, color: 'secondary' },
+            ]}
+            onPaste={setInput}
+          />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 6 }} ref={outputRef} sx={{ scrollMarginTop: 64 }}>
           <Typography variant="h6" gutterBottom>
             Formatted Output
           </Typography>

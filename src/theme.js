@@ -73,6 +73,11 @@ export function bracketBackground(color, surface, size = 10) {
 
 const motion = '150ms cubic-bezier(0.2, 0, 0, 1)';
 
+// Phone layout (below MUI's `sm`). Matches PHONE_QUERY in Common/ToolActionBar.
+const PHONE = '@media (max-width: 599.95px)';
+// ToolActionBar height on phones: 8px + 48px button + 8px, before the gesture-bar inset.
+const ACTION_BAR_PX = 64;
+
 function buildTheme(mode) {
   const t = tokens[mode];
   const isDark = mode === 'dark';
@@ -150,6 +155,14 @@ function buildTheme(mode) {
             color: t.ink,
             whiteSpace: 'nowrap',
           },
+          // Phones with a ToolActionBar (fixed, 64px + gesture-bar inset):
+          // keep the page end and bottom toasts clear of it.
+          [PHONE]: {
+            'main:has([data-action-bar])': { paddingBottom: `calc(${ACTION_BAR_PX}px + env(safe-area-inset-bottom))` },
+            'body:has([data-action-bar]) .MuiSnackbar-anchorOriginBottomCenter': {
+              bottom: `calc(${ACTION_BAR_PX + 8}px + env(safe-area-inset-bottom))`,
+            },
+          },
           '@keyframes mc-blink': { '50%': { opacity: 0 } },
           '@keyframes mc-spin': { to: { transform: 'rotate(360deg)' } },
           '*, *::before, *::after': {
@@ -172,6 +185,7 @@ function buildTheme(mode) {
           root: {
             borderRadius: 0,
             minHeight: 36,
+            [PHONE]: { minHeight: 48 }, // Android touch-target guidance
             transition: `box-shadow ${motion}, background-color ${motion}, border-color ${motion}`,
             '&.Mui-focusVisible': focusRing,
           },
@@ -210,6 +224,7 @@ function buildTheme(mode) {
         styleOverrides: {
           root: {
             borderRadius: 0,
+            [PHONE]: { minWidth: 48, minHeight: 48 },
             '&:hover': { backgroundColor: t.ruleSoft },
             '&.Mui-focusVisible': focusRing,
           },
@@ -222,6 +237,11 @@ function buildTheme(mode) {
           fullWidth: true,
           multiline: true,
           minRows: 4,
+          // Code, not prose: stop mobile keyboards from capitalising the
+          // first key, "correcting" SQL keywords and underlining everything.
+          slotProps: {
+            htmlInput: { autoCapitalize: 'off', autoCorrect: 'off', autoComplete: 'off', spellCheck: false },
+          },
         },
       },
 

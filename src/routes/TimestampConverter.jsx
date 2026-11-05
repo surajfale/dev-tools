@@ -4,8 +4,6 @@ import {
   Grid,
   TextField,
   Box,
-  Button,
-  Stack,
   Paper,
   Table,
   TableBody,
@@ -14,11 +12,13 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
-import { Clear, AccessTime, Refresh } from '@mui/icons-material';
+import { Clear, AccessTime, Refresh, ScienceOutlined } from '@mui/icons-material';
 import { convertTimestamp, getCurrentTimestamp } from '../lib/convertTime';
 import CopyButton from '../components/Common/CopyButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
-import SampleInputButton from '../components/Common/SampleInputButton';
+import ToolActionBar from '../components/Common/ToolActionBar';
+import useStoredState from '../components/Common/useStoredState';
+import useRevealOnPhone from '../components/Common/useRevealOnPhone';
 import PageHeader from '../components/Common/PageHeader';
 
 const sampleTimestamps = [
@@ -28,9 +28,10 @@ const sampleTimestamps = [
 ];
 
 export default function TimestampConverter() {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useStoredState('timestamp.input', '');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [outputRef, revealOutput] = useRevealOnPhone();
   const [currentTime, setCurrentTime] = useState(getCurrentTimestamp);
 
   const handleConvert = useCallback(() => {
@@ -39,11 +40,12 @@ export default function TimestampConverter() {
     if (conversionResult.success) {
       setResult(conversionResult.result);
       setError('');
+      revealOutput();
     } else {
       setError(conversionResult.error);
       setResult(null);
     }
-  }, [input]);
+  }, [input, revealOutput]);
 
   const handleClear = () => {
     setInput('');
@@ -114,32 +116,15 @@ export default function TimestampConverter() {
             minRows={3}
             aria-label="Timestamp input"
           />
-          <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<AccessTime />}
-              onClick={handleConvert}
-              disabled={!input.trim()}
-            >
-              Convert
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<Clear />}
-              onClick={handleClear}
-            >
-              Clear
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<Refresh />}
-              onClick={handleNow}
-              color="success"
-            >
-              Now
-            </Button>
-            <SampleInputButton onLoadSample={handleLoadSample} />
-          </Stack>
+          <ToolActionBar
+            primary={{ label: 'Convert', icon: <AccessTime />, onClick: handleConvert, disabled: !input.trim() }}
+            actions={[
+              { label: 'Clear', icon: <Clear />, onClick: handleClear },
+              { label: 'Now', ariaLabel: 'Use current time', icon: <Refresh />, onClick: handleNow, color: 'success' },
+              { label: 'Sample', ariaLabel: 'Load sample input', icon: <ScienceOutlined />, onClick: handleLoadSample, color: 'secondary' },
+            ]}
+            onPaste={setInput}
+          />
 
           <Box sx={{ mt: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -166,7 +151,7 @@ export default function TimestampConverter() {
           </Box>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 6 }} ref={outputRef} sx={{ scrollMarginTop: 64 }}>
           <Typography variant="h6" gutterBottom>
             Conversion Result
           </Typography>

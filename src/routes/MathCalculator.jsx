@@ -4,16 +4,17 @@ import {
   Grid,
   TextField,
   Box,
-  Button,
   Stack,
   Card,
   CardContent
 } from '@mui/material';
-import { Clear, Calculate } from '@mui/icons-material';
+import { Clear, Calculate, ScienceOutlined } from '@mui/icons-material';
 import { calculateSum, formatNumber } from '../lib/calculateSum';
 import CopyButton from '../components/Common/CopyButton';
 import ErrorAlert from '../components/Common/ErrorAlert';
-import SampleInputButton from '../components/Common/SampleInputButton';
+import ToolActionBar from '../components/Common/ToolActionBar';
+import useStoredState from '../components/Common/useStoredState';
+import useRevealOnPhone from '../components/Common/useRevealOnPhone';
 import PageHeader from '../components/Common/PageHeader';
 
 const sampleNumbers = `10
@@ -23,9 +24,10 @@ const sampleNumbers = `10
 100`;
 
 export default function MathCalculator() {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useStoredState('math.input', '');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [outputRef, revealOutput] = useRevealOnPhone();
 
   const handleCalculate = useCallback(() => {
     const calculation = calculateSum(input);
@@ -33,11 +35,12 @@ export default function MathCalculator() {
     if (calculation.success) {
       setResult(calculation.result);
       setError('');
+      revealOutput();
     } else {
       setError(calculation.error);
       setResult(null);
     }
-  }, [input]);
+  }, [input, revealOutput]);
 
   const handleClear = () => {
     setInput('');
@@ -80,27 +83,17 @@ export default function MathCalculator() {
             minRows={15}
             aria-label="Number input"
           />
-          <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<Calculate />}
-              onClick={handleCalculate}
-              disabled={!input.trim()}
-            >
-              Calculate
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<Clear />}
-              onClick={handleClear}
-            >
-              Clear
-            </Button>
-            <SampleInputButton onLoadSample={handleLoadSample} />
-          </Stack>
+          <ToolActionBar
+            primary={{ label: 'Calculate', icon: <Calculate />, onClick: handleCalculate, disabled: !input.trim() }}
+            actions={[
+              { label: 'Clear', icon: <Clear />, onClick: handleClear },
+              { label: 'Sample', ariaLabel: 'Load sample input', icon: <ScienceOutlined />, onClick: handleLoadSample, color: 'secondary' },
+            ]}
+            onPaste={setInput}
+          />
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 6 }} ref={outputRef} sx={{ scrollMarginTop: 64 }}>
           <Typography variant="h6" gutterBottom>
             Results
           </Typography>

@@ -23,6 +23,14 @@ const SECTIONS = [
       { value: 'off', label: 'Never', hint: 'Skip it. Always skipped with reduced motion' },
     ],
   },
+  {
+    key: 'remember',
+    title: 'Remember input',
+    options: [
+      { value: 'on', label: 'On this device', hint: 'Keep each tool\'s input across restarts. Stored locally, never sent anywhere' },
+      { value: 'off', label: 'Off', hint: 'Forget input when you leave a tool. Deletes anything stored' },
+    ],
+  },
 ];
 
 const subheaderSx = {
@@ -43,7 +51,7 @@ function OptionText({ label, hint }) {
   );
 }
 
-/** Header control for user preferences: output typing and the intro sequence. */
+/** Header control for user preferences: output typing, intro sequence, remembered input. */
 export default function SettingsMenu({ sx }) {
   const { settings, updateSettings, replayIntro } = useSettings();
   const [anchor, setAnchor] = useState(null);
