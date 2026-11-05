@@ -39,21 +39,21 @@ pnpm deploy:netlify
 - **Required**: pnpm (configured in `packageManager` field)
 - **Node Version**: 24.22.2 LTS (specified in `.nvmrc`; react-router-dom v7 needs ≥20)
 - **Lockfile**: Netlify installs with `--frozen-lockfile`; commit `pnpm-lock.yaml` with every dependency change or the deploy fails
-- **ESLint**: stays on v9 until `eslint-plugin-react` supports v10
+- **ESLint**: v10 flat config with `@eslint-react/eslint-plugin` (replaces `eslint-plugin-react`, which does not support v10), plus `react-hooks` v7 and `react-refresh`
 
 ## Architecture Overview
 
 ### Tech Stack
-- **React 18** with functional components and hooks
-- **Vite** as build tool with React plugin
-- **Material UI (MUI) v5** for consistent UI components and theming
+- **React 19** with functional components and hooks (`use(Context)`, `<Context value>` as provider)
+- **Vite 8** (Rolldown) as build tool with React plugin; **Vitest 5** for tests
+- **Material UI (MUI) v9** for consistent UI components and theming. Use `slotProps` (e.g. `slotProps={{ paper: … }}`, `{ list: … }`), never the removed `PaperProps`/`MenuListProps`/`InputProps` (v9 silently ignores them). Grid uses `size={{ xs: 12, md: 6 }}`, not `item xs md`
 - **React Router DOM** for client-side routing
 - **ESLint** with React, hooks, and refresh plugins
 
 ### Key Libraries
 - `sql-formatter` - SQL dialect formatting
 - `marked` - Markdown parsing to HTML
-- `js-yaml` - YAML parsing and stringification
+- `js-yaml` v5 - YAML parsing and stringification (named exports only: `import { load, dump } from 'js-yaml'`)
 - `dayjs` - Lightweight date manipulation
 - `dompurify` - HTML sanitization for security
 
@@ -165,7 +165,7 @@ Each tool follows this pattern:
 ### Vite Configuration
 - Development server configured on port 3000 with auto-open browser
 - React plugin with fast refresh enabled
-- ESM modules with React 18 support
+- ESM modules with React 19 support
 
 ### Theme System
 - Dual theme support (light/dark) with system preference detection
