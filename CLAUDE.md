@@ -36,7 +36,10 @@ pnpm deploy:netlify
 
 ## Package Manager Configuration
 
-- **Required**: pnpm (configured in `packageManager` field)
+- **Required**: pnpm 12 (pinned in the `packageManager` field; older pnpm can't read the v9 lockfile)
+- **pnpm settings live in `pnpm-workspace.yaml`** (overrides, `allowBuilds`). pnpm 11+ ignores the `pnpm` field in package.json, and pnpm 12 fails on unknown keys there
+- **Install scripts are blocked by default**: a new dependency that needs one shows up under "Ignored build scripts"; approve it with `pnpm approve-builds` (writes `allowBuilds`) only after checking what it runs
+- **Release cooldown**: pnpm's built-in `minimumReleaseAge` (1440 min, non-strict) avoids resolving versions published in the last 24h
 - **Node Version**: 24.22.2 LTS (specified in `.nvmrc`; react-router-dom v7 needs ≥20)
 - **Lockfile**: Netlify installs with `--frozen-lockfile`; commit `pnpm-lock.yaml` with every dependency change or the deploy fails
 - **ESLint**: v10 flat config with `@eslint-react/eslint-plugin` (replaces `eslint-plugin-react`, which does not support v10), plus `react-hooks` v7 and `react-refresh`
