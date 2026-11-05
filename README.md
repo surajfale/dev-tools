@@ -84,7 +84,7 @@ A comprehensive collection of essential developer utilities built with React, Vi
 
 ### Prerequisites
 
-- Node.js 18.18.0+ (see `.nvmrc`)
+- Node.js 24+ (see `.nvmrc`)
 - pnpm (required - configured as package manager)
 
 ### Installation

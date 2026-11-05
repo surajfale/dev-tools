@@ -28,5 +28,5 @@ export default function SettingsProvider({ children }) {
     [settings, updateSettings, introRun, replayIntro],
   );
 
-  return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
+  return <SettingsContext value={value}>{children}</SettingsContext>;
 }

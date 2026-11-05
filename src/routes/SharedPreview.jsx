@@ -1,46 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Box, Button, Typography, Alert, CircularProgress } from '@mui/material';
+import { Box, Button, Typography, Alert } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { sanitizeHtml } from '../lib/previewHtml';
 
 export default function SharedPreview() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [html, setHtml] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const encodedHtml = searchParams.get('content');
 
-  useEffect(() => {
+  // Pure function of the URL, so derive it rather than mirroring it into state.
+  const { html, error } = useMemo(() => {
+    if (!encodedHtml) return { html: '', error: 'No preview content found in URL' };
     try {
-      const encodedHtml = searchParams.get('content');
+      // Decode base64 URL-safe string (handle Unicode)
+      const base64 = encodedHtml.replace(/-/g, '+').replace(/_/g, '/');
+      const binaryString = atob(base64);
+      const bytes = Uint8Array.from(binaryString, (c) => c.charCodeAt(0));
+      const decoded = new TextDecoder().decode(bytes);
 
-      if (encodedHtml) {
-        // Decode base64 URL-safe string (handle Unicode)
-        const base64 = encodedHtml.replace(/-/g, '+').replace(/_/g, '/');
-        const binaryString = atob(base64);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        const decoded = new TextDecoder().decode(bytes);
-
-        // Sanitize the decoded HTML
-        const sanitized = sanitizeHtml(decoded);
-        if (sanitized.success) {
-          setHtml(sanitized.result);
-        } else {
-          setError('Failed to sanitize HTML: ' + sanitized.error);
-        }
-      } else {
-        setError('No preview content found in URL');
-      }
+      // Sanitize the decoded HTML
+      const sanitized = sanitizeHtml(decoded);
+      return sanitized.success
+        ? { html: sanitized.result, error: '' }
+        : { html: '', error: 'Failed to sanitize HTML: ' + sanitized.error };
     } catch (err) {
-      setError('Failed to load preview: ' + err.message);
-    } finally {
-      setLoading(false);
+      return { html: '', error: 'Failed to load preview: ' + err.message };
     }
-  }, [searchParams]);
+  }, [encodedHtml]);
 
   if (error) {
     return (
@@ -53,15 +40,6 @@ export default function SharedPreview() {
           Back to HTML Preview
         </Button>
         <Alert severity="error">{error}</Alert>
-      </Box>
-    );
-  }
-
-  if (loading) {
-    return (
-      <Box sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 2 }}>
-        <CircularProgress />
-        <Typography color="text.secondary">Loading HTML preview...</Typography>
       </Box>
     );
   }

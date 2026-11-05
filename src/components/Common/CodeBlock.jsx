@@ -65,11 +65,11 @@ function missionPrism(t) {
  */
 function useTypingReveal(code, enabled) {
   const [shown, setShown] = useState(code);
-  const previous = useRef(code);
+  const previousRef = useRef(code);
 
   useEffect(() => {
-    const changed = code !== previous.current;
-    previous.current = code;
+    const changed = code !== previousRef.current;
+    previousRef.current = code;
     const lines = code ? code.split('\n') : [];
     const plan = changed && code && enabled ? planReveal(lines.length) : null;
 

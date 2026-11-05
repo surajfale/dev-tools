@@ -22,6 +22,8 @@ import SampleInputButton from '../components/Common/SampleInputButton';
 import CodeBlock from '../components/Common/CodeBlock';
 import PageHeader from '../components/Common/PageHeader';
 
+const MAX_URL_LENGTH = 8000;
+
 const sampleHtml = `<!DOCTYPE html>
 <html>
 <head>
@@ -107,57 +109,64 @@ export default function HtmlPreview() {
     setError('');
   };
 
+  // Returns { url, stats }; url is null when the link would exceed the URL budget.
+  // Stats are returned (not only stored) so the same click can report them,
+  // before the setState round-trip lands.
   const generateShareableUrl = () => {
-    if (sanitizedHtml) {
-      try {
-        // Minify HTML to reduce size
-        const minified = minifyHtml(sanitizedHtml);
-        const stats = calculateCompression(sanitizedHtml, minified);
-        setCompressionStats(stats);
+    if (!sanitizedHtml) return { url: null, stats: null };
+    try {
+      // Minify HTML to reduce size
+      const minified = minifyHtml(sanitizedHtml);
+      const stats = calculateCompression(sanitizedHtml, minified);
+      setCompressionStats(stats);
 
-        // Encode minified HTML to base64 URL-safe format (handle Unicode)
-        const utf8Bytes = new TextEncoder().encode(minified);
-        const binaryString = Array.from(utf8Bytes, byte => String.fromCharCode(byte)).join('');
-        const encoded = btoa(binaryString)
-          .replace(/\+/g, '-')
-          .replace(/\//g, '_')
-          .replace(/=+$/, '');
+      // Encode minified HTML to base64 URL-safe format (handle Unicode)
+      const utf8Bytes = new TextEncoder().encode(minified);
+      const binaryString = Array.from(utf8Bytes, byte => String.fromCharCode(byte)).join('');
+      const encoded = btoa(binaryString)
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
 
-        const url = `${window.location.origin}/preview?content=${encoded}`;
+      const url = `${window.location.origin}/preview?content=${encoded}`;
 
-        // Check URL length (browsers typically limit to 2000-8000 chars)
-        if (url.length > 8000) {
-          return null; // Too long for URL
-        }
-
-        setShareableUrl(url);
-        return url;
-      } catch (err) {
-        console.error('Error generating shareable URL:', err);
-        return null;
+      // Check URL length (browsers typically limit to 2000-8000 chars)
+      if (url.length > MAX_URL_LENGTH) {
+        return { url: null, stats };
       }
+
+      setShareableUrl(url);
+      return { url, stats };
+    } catch (err) {
+      console.error('Error generating shareable URL:', err);
+      return { url: null, stats: null };
     }
-    return '';
+  };
+
+  const tooLargeMessage = (stats) => {
+    const estimated = stats?.minifiedSize
+      ? Math.ceil(stats.minifiedSize * 1.37) // Base64 is ~37% larger
+      : 'unknown';
+    return `HTML content too large for a shareable link even after ${stats?.reduction || 0}% compression (estimated URL: ${estimated} chars, max: ${MAX_URL_LENGTH}). Use the Download button instead for large files.`;
   };
 
   const handleOpenInNewTab = () => {
-    const url = generateShareableUrl();
+    if (!sanitizedHtml) return;
+    const { url, stats } = generateShareableUrl();
     if (url) {
-      window.open(url, '_blank');
-    } else if (sanitizedHtml) {
-      // Fallback: Open in new window without shareable URL (for large HTML)
-      const newWindow = window.open('', '_blank');
-      newWindow.document.write(sanitizedHtml);
-      newWindow.document.close();
-
-      // Show info instead of error - this is expected behavior for large files
+      // The /preview route renders the content inside a sandboxed iframe.
+      window.open(url, '_blank', 'noopener');
       setError('');
-      setShowCopyAlert(false);
+    } else {
+      // Deliberately no document.write() fallback: an about:blank window inherits
+      // this app's origin, so previewed scripts would run unsandboxed with access
+      // to our storage and service-worker cache.
+      setError(tooLargeMessage(stats));
     }
   };
 
   const handleCopyShareableLink = async () => {
-    const url = generateShareableUrl();
+    const { url, stats } = generateShareableUrl();
     if (url) {
       try {
         await navigator.clipboard.writeText(url);
@@ -168,10 +177,7 @@ export default function HtmlPreview() {
         setError('Failed to copy link to clipboard');
       }
     } else {
-      const encodedLength = compressionStats?.minifiedSize ?
-        Math.ceil(compressionStats.minifiedSize * 1.37) : // Base64 is ~37% larger
-        'unknown';
-      setError(`HTML content too large for a shareable link even after ${compressionStats?.reduction || 0}% compression (estimated URL: ${encodedLength} chars, max: 8000). Try the Download button instead for large files.`);
+      setError(tooLargeMessage(stats));
     }
   };
 
@@ -200,7 +206,7 @@ export default function HtmlPreview() {
       </Alert>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="h6" gutterBottom>
             HTML Input
           </Typography>
@@ -231,7 +237,7 @@ export default function HtmlPreview() {
           </Stack>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
             <Tabs value={activeTab} onChange={(e, val) => setActiveTab(val)}>
               <Tab label="Preview" icon={<Visibility />} iconPosition="start" />
@@ -289,7 +295,7 @@ export default function HtmlPreview() {
                     </Button>
                   </Stack>
                   {compressionStats && shareableUrl && (
-                    <Alert severity={shareableUrl.length > 8000 ? "warning" : "info"} sx={{ mt: 2 }}>
+                    <Alert severity={shareableUrl.length > MAX_URL_LENGTH ? "warning" : "info"} sx={{ mt: 2 }}>
                       <Typography variant="caption" display="block">
                         <strong>Automatic Compression Applied:</strong>
                       </Typography>
@@ -300,7 +306,7 @@ export default function HtmlPreview() {
                       </Typography>
                       <Typography variant="caption" display="block" color="text.secondary">
                         Final URL length: {shareableUrl.length.toLocaleString()}/8,000 chars
-                        {shareableUrl.length > 8000 ? ' ⚠️ Too long - use the Download button instead' : ' ✓ Ready to share'}
+                        {shareableUrl.length > MAX_URL_LENGTH ? ' ⚠️ Too long - use the Download button instead' : ' ✓ Ready to share'}
                       </Typography>
                     </Alert>
                   )}

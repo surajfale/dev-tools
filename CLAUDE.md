@@ -36,22 +36,27 @@ pnpm deploy:netlify
 
 ## Package Manager Configuration
 
-- **Required**: pnpm (configured in `packageManager` field)
-- **Node Version**: 20.20.2 (specified in `.nvmrc`; required by react-router-dom v7)
+- **Required**: pnpm 12 (pinned in the `packageManager` field; older pnpm can't read the v9 lockfile)
+- **pnpm settings live in `pnpm-workspace.yaml`** (overrides, `allowBuilds`). pnpm 11+ ignores the `pnpm` field in package.json, and pnpm 12 fails on unknown keys there
+- **Install scripts are blocked by default**: a new dependency that needs one shows up under "Ignored build scripts"; approve it with `pnpm approve-builds` (writes `allowBuilds`) only after checking what it runs
+- **Release cooldown**: pnpm's built-in `minimumReleaseAge` (1440 min, non-strict) avoids resolving versions published in the last 24h
+- **Node Version**: 24.22.2 LTS (specified in `.nvmrc`; react-router-dom v7 needs ≥20)
+- **Lockfile**: Netlify installs with `--frozen-lockfile`; commit `pnpm-lock.yaml` with every dependency change or the deploy fails
+- **ESLint**: v10 flat config with `@eslint-react/eslint-plugin` (replaces `eslint-plugin-react`, which does not support v10), plus `react-hooks` v7 and `react-refresh`
 
 ## Architecture Overview
 
 ### Tech Stack
-- **React 18** with functional components and hooks
-- **Vite** as build tool with React plugin
-- **Material UI (MUI) v5** for consistent UI components and theming
+- **React 19** with functional components and hooks (`use(Context)`, `<Context value>` as provider)
+- **Vite 8** (Rolldown) as build tool with React plugin; **Vitest 5** for tests
+- **Material UI (MUI) v9** for consistent UI components and theming. Use `slotProps` (e.g. `slotProps={{ paper: … }}`, `{ list: … }`), never the removed `PaperProps`/`MenuListProps`/`InputProps` (v9 silently ignores them). Grid uses `size={{ xs: 12, md: 6 }}`, not `item xs md`
 - **React Router DOM** for client-side routing
 - **ESLint** with React, hooks, and refresh plugins
 
 ### Key Libraries
 - `sql-formatter` - SQL dialect formatting
 - `marked` - Markdown parsing to HTML
-- `js-yaml` - YAML parsing and stringification
+- `js-yaml` v5 - YAML parsing and stringification (named exports only: `import { load, dump } from 'js-yaml'`)
 - `dayjs` - Lightweight date manipulation
 - `dompurify` - HTML sanitization for security
 
@@ -163,7 +168,7 @@ Each tool follows this pattern:
 ### Vite Configuration
 - Development server configured on port 3000 with auto-open browser
 - React plugin with fast refresh enabled
-- ESM modules with React 18 support
+- ESM modules with React 19 support
 
 ### Theme System
 - Dual theme support (light/dark) with system preference detection
@@ -231,6 +236,8 @@ Always consider the app's core features (JSON/SQL formatting, timestamp conversi
 ### HTML Preview Tool
 - 100% client-side: nothing is ever sent to a server or a third party. Do not reintroduce a cloud-upload/pastebin feature — it was deliberately removed for this reason.
 - Uses iframe with `sandbox="allow-scripts"` (no `allow-same-origin`) so previewed HTML runs in an isolated opaque origin and cannot reach into the app's own origin/storage
+- Never render previewed HTML outside that sandboxed iframe: no `document.write` into a `window.open('')` tab, no unsandboxed blob/data window. Those inherit the app origin and would expose localStorage and the service-worker cache (which serves `/assets/*` cache-first). `sanitizeHtml` deliberately keeps scripts, so the sandbox is the only isolation control. Content too large for a share link gets the "use Download" error
+- `netlify.toml` CSP intentionally omits `script-src`/`style-src`: srcdoc iframes inherit the parent CSP, so restricting them would break previewed HTML
 - Shareable links embed minified HTML directly in the URL (`/preview?content=<base64>`) via `src/lib/minifyHtml.js` — reduces size 30-60% to fit the ~8000 char URL limit
 - Privacy notice displayed to users: content lives entirely in the URL, so anyone with the link can see it
 

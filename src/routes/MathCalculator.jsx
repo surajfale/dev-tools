@@ -69,7 +69,7 @@ export default function MathCalculator() {
       </PageHeader>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="h6" gutterBottom>
             Input Numbers
           </Typography>
@@ -100,7 +100,7 @@ export default function MathCalculator() {
           </Stack>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="h6" gutterBottom>
             Results
           </Typography>
@@ -123,7 +123,7 @@ export default function MathCalculator() {
 
               <Box>
               <Grid container spacing={2}>
-                <Grid item xs={6}>
+                <Grid size={6}>
                   <Card>
                     <CardContent>
                       <Typography variant="subtitle2" color="text.secondary">
@@ -136,7 +136,7 @@ export default function MathCalculator() {
                   </Card>
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid size={6}>
                   <Card>
                     <CardContent>
                       <Typography variant="subtitle2" color="text.secondary">
@@ -149,7 +149,7 @@ export default function MathCalculator() {
                   </Card>
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid size={6}>
                   <Card>
                     <CardContent>
                       <Typography variant="subtitle2" color="text.secondary">
@@ -162,7 +162,7 @@ export default function MathCalculator() {
                   </Card>
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid size={6}>
                   <Card>
                     <CardContent>
                       <Typography variant="subtitle2" color="text.secondary">

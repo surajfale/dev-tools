@@ -1,4 +1,4 @@
-import yaml from 'js-yaml';
+import { dump, load } from 'js-yaml';
 
 export const convertJsonToYaml = (json) => {
   try {
@@ -7,7 +7,7 @@ export const convertJsonToYaml = (json) => {
     }
 
     const parsed = JSON.parse(json);
-    const yamlResult = yaml.dump(parsed, {
+    const yamlResult = dump(parsed, {
       indent: 2,
       lineWidth: 120,
       noRefs: true,
@@ -36,7 +36,7 @@ export const convertYamlToJson = (yamlInput, options = {}) => {
       return { success: false, error: 'Input is empty' };
     }
 
-    const parsed = yaml.load(yamlInput);
+    const parsed = load(yamlInput);
     const jsonResult = minify 
       ? JSON.stringify(parsed)
       : JSON.stringify(parsed, null, indent);
@@ -52,7 +52,7 @@ export const convertYamlToJson = (yamlInput, options = {}) => {
 
 export const validateYaml = (yamlInput) => {
   try {
-    yaml.load(yamlInput);
+    load(yamlInput);
     return { valid: true };
   } catch (error) {
     return { 

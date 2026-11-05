@@ -1,6 +1,7 @@
-// Bump when shipped assets change identity (v2: Mission Control icons) so
+// Bump when shipped assets change identity (v2: Mission Control icons;
+// v3: evict any entries a pre-fix unsandboxed preview window could have written) so
 // installed clients drop stale cached copies on activate.
-const CACHE_NAME = 'dev-tools-cache-v2';
+const CACHE_NAME = 'dev-tools-cache-v3';
 const PRECACHE_URLS = [
   '/',
   '/index.html',

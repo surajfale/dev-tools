@@ -1,0 +1,17 @@
+# pnpm settings (pnpm 11+ reads these here, not from package.json "pnpm" or .npmrc).
+# pnpm 12 fails on unknown keys here, so a typo can't silently drop a policy.
+
+# Security floors for transitive dependencies with known advisories.
+overrides:
+  prismjs: ^1.30.0
+  flatted: ^3.4.2
+  nanoid@<4: ^3.3.18
+  ajv@6: ^6.14.0
+  yaml@1: ^1.10.3
+  postcss: ^8.5.23
+  '@babel/core': ^7.29.6
+  minimatch@>=7 <11.0.1: ^11.0.1
+
+# Dependency install scripts are blocked unless listed here (pnpm default).
+# Nothing in this tree needs one: sharp and rolldown ship prebuilt binaries.
+allowBuilds: {}

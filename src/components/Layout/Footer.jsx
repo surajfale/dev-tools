@@ -1,8 +1,10 @@
 import { Box, Typography } from '@mui/material';
 
-export default function Footer() {
-  const year = new Date().getFullYear();
+// Read once at module load: render must stay pure, and the year rolling over
+// mid-session is not worth an effect.
+const year = new Date().getFullYear();
 
+export default function Footer() {
   return (
     <Box
       component="footer"

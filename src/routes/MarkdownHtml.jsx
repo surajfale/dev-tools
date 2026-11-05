@@ -47,7 +47,7 @@ function greet(name) {
 
 [Visit our website](https://example.com)
 
-![Sample Image](https://via.placeholder.com/150x100?text=Sample)
+![Sample Image](data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='150'%20height='100'%3E%3Crect%20width='150'%20height='100'%20fill='%23FFB020'/%3E%3Ctext%20x='75'%20y='56'%20font-family='monospace'%20font-size='14'%20text-anchor='middle'%3ESAMPLE%3C/text%3E%3C/svg%3E)
 
 ## Table
 
@@ -171,7 +171,7 @@ export default function MarkdownHtml() {
       </Box>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="h6" gutterBottom>
             {inputLabel}
           </Typography>
@@ -202,7 +202,7 @@ export default function MarkdownHtml() {
           </Stack>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="h6" gutterBottom>
             {outputLabel}
           </Typography>
@@ -219,7 +219,7 @@ export default function MarkdownHtml() {
         </Grid>
 
         {isMarkdownToHtml && preview && (
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Divider sx={{ my: 2 }} />
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Visibility sx={{ mr: 1 }} />
@@ -235,7 +235,9 @@ export default function MarkdownHtml() {
                 '& > *:last-child': { mb: 0 }
               }}
             >
-              <div 
+              <div
+                // `preview` is DOMPurify output (default config) from convertMarkdownToHtml
+                // eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml
                 dangerouslySetInnerHTML={{ __html: preview }}
                 style={{
                   lineHeight: 1.6,

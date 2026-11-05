@@ -132,7 +132,7 @@ export default function SqlFormatter() {
       </Box>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="h6" gutterBottom>
             Input SQL
           </Typography>
@@ -163,7 +163,7 @@ export default function SqlFormatter() {
           </Stack>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="h6" gutterBottom>
             Formatted Output
           </Typography>
