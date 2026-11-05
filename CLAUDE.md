@@ -38,6 +38,8 @@ pnpm deploy:netlify
 
 - **Required**: pnpm (configured in `packageManager` field)
 - **Node Version**: 24.22.2 LTS (specified in `.nvmrc`; react-router-dom v7 needs ≥20)
+- **Lockfile**: Netlify installs with `--frozen-lockfile`; commit `pnpm-lock.yaml` with every dependency change or the deploy fails
+- **ESLint**: stays on v9 until `eslint-plugin-react` supports v10
 
 ## Architecture Overview
 
@@ -231,6 +233,8 @@ Always consider the app's core features (JSON/SQL formatting, timestamp conversi
 ### HTML Preview Tool
 - 100% client-side: nothing is ever sent to a server or a third party. Do not reintroduce a cloud-upload/pastebin feature — it was deliberately removed for this reason.
 - Uses iframe with `sandbox="allow-scripts"` (no `allow-same-origin`) so previewed HTML runs in an isolated opaque origin and cannot reach into the app's own origin/storage
+- Never render previewed HTML outside that sandboxed iframe: no `document.write` into a `window.open('')` tab, no unsandboxed blob/data window. Those inherit the app origin and would expose localStorage and the service-worker cache (which serves `/assets/*` cache-first). `sanitizeHtml` deliberately keeps scripts, so the sandbox is the only isolation control. Content too large for a share link gets the "use Download" error
+- `netlify.toml` CSP intentionally omits `script-src`/`style-src`: srcdoc iframes inherit the parent CSP, so restricting them would break previewed HTML
 - Shareable links embed minified HTML directly in the URL (`/preview?content=<base64>`) via `src/lib/minifyHtml.js` — reduces size 30-60% to fit the ~8000 char URL limit
 - Privacy notice displayed to users: content lives entirely in the URL, so anyone with the link can see it
 

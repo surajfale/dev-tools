@@ -1,13 +1,40 @@
 [build]
   publish = "dist"
-  command = "pnpm install --no-frozen-lockfile && pnpm build"
+  # Install exactly what pnpm-lock.yaml pins; a drifted lockfile fails the build
+  # instead of silently shipping freshly resolved (unreviewed) versions.
+  command = "pnpm install --frozen-lockfile && pnpm build"
 
 [build.environment]
   NODE_VERSION = "24.22.2"
-  NPM_FLAGS = "--no-frozen-lockfile"
-  PNPM_FLAGS = "--no-frozen-lockfile"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Security headers.
+# The CSP deliberately has no script-src/style-src/default-src: srcdoc iframes
+# inherit the parent's CSP (sandboxed or not), so restricting scripts here would
+# also break user HTML in the HTML Preview / shared /preview pages. Script
+# isolation for previewed HTML comes from the iframe sandbox instead.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "frame-ancestors 'none'; object-src 'none'"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+
+# Shared previews carry the whole document in the query string: never leak it
+# via Referer, not even to same-origin requests.
+[[headers]]
+  for = "/preview"
+  [headers.values]
+    Referrer-Policy = "no-referrer"
+
+# Let service-worker updates (e.g. a CACHE_NAME bump) reach clients promptly.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
