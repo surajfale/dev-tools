@@ -50,12 +50,14 @@ export default function OutputPopout({ open, onClose, title, code, language, fil
       open={open}
       onClose={onClose}
       aria-labelledby={titleId}
-      PaperProps={{
-        sx: {
-          bgcolor: 'background.default',
-          backgroundImage: (t) =>
-            `linear-gradient(${t.palette.tokens.grid} 1px, transparent 1px), linear-gradient(90deg, ${t.palette.tokens.grid} 1px, transparent 1px)`,
-          backgroundSize: '32px 32px',
+      slotProps={{
+        paper: {
+          sx: {
+            bgcolor: 'background.default',
+            backgroundImage: (t) =>
+              `linear-gradient(${t.palette.tokens.grid} 1px, transparent 1px), linear-gradient(90deg, ${t.palette.tokens.grid} 1px, transparent 1px)`,
+            backgroundSize: '32px 32px',
+          },
         },
       }}
     >

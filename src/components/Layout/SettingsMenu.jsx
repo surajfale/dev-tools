@@ -73,7 +73,7 @@ export default function SettingsMenu({ sx }) {
         onClose={close}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        MenuListProps={{ 'aria-labelledby': 'settings-button', dense: true, sx: { py: 0, width: 300 } }}
+        slotProps={{ list: { 'aria-labelledby': 'settings-button', dense: true, sx: { py: 0, width: 300 } } }}
       >
         {SECTIONS.map((section, i) => (
           <Fragment key={section.key}>

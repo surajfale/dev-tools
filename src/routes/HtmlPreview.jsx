@@ -206,7 +206,7 @@ export default function HtmlPreview() {
       </Alert>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="h6" gutterBottom>
             HTML Input
           </Typography>
@@ -237,7 +237,7 @@ export default function HtmlPreview() {
           </Stack>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
             <Tabs value={activeTab} onChange={(e, val) => setActiveTab(val)}>
               <Tab label="Preview" icon={<Visibility />} iconPosition="start" />

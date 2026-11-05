@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, use } from 'react';
 import { DEFAULT_SETTINGS } from '../../lib/settings';
 
 // Default value lets components render outside the provider (e.g. in tests).
@@ -14,5 +14,5 @@ export const SettingsContext = createContext({
  * `introRun` increments each time the user asks to replay the intro.
  */
 export function useSettings() {
-  return useContext(SettingsContext);
+  return use(SettingsContext);
 }

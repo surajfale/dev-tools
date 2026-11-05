@@ -31,7 +31,7 @@ export default function TimestampConverter() {
   const [input, setInput] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
-  const [currentTime, setCurrentTime] = useState(getCurrentTimestamp());
+  const [currentTime, setCurrentTime] = useState(getCurrentTimestamp);
 
   const handleConvert = useCallback(() => {
     const conversionResult = convertTimestamp(input);
@@ -103,7 +103,7 @@ export default function TimestampConverter() {
       </PageHeader>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="h6" gutterBottom>
             Input Timestamp
           </Typography>
@@ -166,7 +166,7 @@ export default function TimestampConverter() {
           </Box>
         </Grid>
 
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="h6" gutterBottom>
             Conversion Result
           </Typography>
